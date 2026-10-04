@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" fill="none">
+  <defs>
+    <linearGradient id="p-bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#2A1408"/>
+      <stop offset="50%" stop-color="#1E0D05"/>
+      <stop offset="100%" stop-color="#0F0602"/>
+    </linearGradient>
+    <linearGradient id="p-gold" x1="0%" y1="100%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#B45309"/>
+      <stop offset="40%" stop-color="#D97706"/>
+      <stop offset="70%" stop-color="#F59E0B"/>
+      <stop offset="100%" stop-color="#FDE68A"/>
+    </linearGradient>
+    <linearGradient id="p-border" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#F59E0B" stop-opacity="0.8"/>
+      <stop offset="50%" stop-color="#78350F" stop-opacity="0.3"/>
+      <stop offset="100%" stop-color="#D97706" stop-opacity="0.7"/>
+    </linearGradient>
+  </defs>
+  <rect x="2" y="2" width="44" height="44" rx="12" fill="url(#p-bg)" stroke="url(#p-border)" stroke-width="1.5"/>
+  <path d="M13 11C11.8954 11 11 11.8954 11 13V35C11 36.1046 11.8954 37 13 37H17.5C18.6046 37 19.5 36.1046 19.5 35V13C19.5 11.8954 18.6046 11 17.5 11H13Z" fill="#FFFFFF"/>
+  <path d="M18 11H27C32.5228 11 37 15.0294 37 20C37 24.9706 32.5228 29 27 29H18V11Z" stroke="url(#p-gold)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+  <rect x="21" y="22" width="2.6" height="4.5" rx="0.8" fill="url(#p-gold)"/>
+  <rect x="25" y="18" width="2.6" height="8.5" rx="0.8" fill="url(#p-gold)"/>
+  <rect x="29" y="14" width="2.6" height="12.5" rx="0.8" fill="url(#p-gold)"/>
+  <path d="M20 25L32 13M32 13H27M32 13V18" stroke="#FFFFFF" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

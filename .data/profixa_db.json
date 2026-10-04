@@ -1,0 +1,654 @@
+{
+  "users": [
+    [
+      "a1000000-0000-0000-0000-000000000001",
+      {
+        "id": "a1000000-0000-0000-0000-000000000001",
+        "email": "admin@profixa.com",
+        "passwordHash": "fb1d27ee47649116d192d828ea0c39af:83799ee7461c71d53879ca67bbaf71acde6773d460ba78d6bd97acd3138ca1dc42e0481044cbc1eeb6e21ca2a94699cfe8e1d048963704f9980e61b69fac8405",
+        "fullName": "System Administrator",
+        "phoneNumber": "+1 (555) 019-9821",
+        "country": "United Kingdom",
+        "address": "10 Financial District, London",
+        "dateOfBirth": "1988-04-12",
+        "idNumber": "GB98231481",
+        "role": "SUPER_ADMIN",
+        "isEmailVerified": true,
+        "kycStatus": "APPROVED",
+        "twoFactorEnabled": true,
+        "isSuspended": false,
+        "createdAt": "2026-01-01T00:00:00.000Z",
+        "updatedAt": "2026-01-01T00:00:00.000Z",
+        "username": "admin"
+      }
+    ],
+    [
+      "u2000000-0000-0000-0000-000000000002",
+      {
+        "id": "u2000000-0000-0000-0000-000000000002",
+        "email": "demo@cryptic.io",
+        "passwordHash": "de0ed0e34a64fbb8851e66e844bc650f:9b2da7348a09d8a6045a287f2db97a08eb9a852ab071c0707f0a88e0ed01e7c971b53c77b0fd1e8caee01c80228d13170310a2839a3e1a73ee988205668a84e7",
+        "fullName": "Demo Trader",
+        "phoneNumber": "+92 300 9876543",
+        "country": "Pakistan",
+        "address": "House 42, Sector F-7/2, Islamabad",
+        "dateOfBirth": "1995-08-20",
+        "idNumber": "61101-1234567-8",
+        "role": "USER",
+        "isEmailVerified": true,
+        "kycStatus": "APPROVED",
+        "twoFactorEnabled": false,
+        "isSuspended": false,
+        "createdAt": "2026-01-15T10:00:00.000Z",
+        "updatedAt": "2026-01-15T10:00:00.000Z"
+      }
+    ],
+    [
+      "u3000000-0000-0000-0000-000000000003",
+      {
+        "id": "u3000000-0000-0000-0000-000000000003",
+        "email": "newuser@cryptic.io",
+        "passwordHash": "93341760e7ece472014e71cf32b400cd:bea4513efc642307958c566676b3c0feaad3c77431423f8c7da0b0a4571d3d7d97e65f56fe5ae5d2c46848cef21604223eefd10d795d7d7780672802dc3e9853",
+        "fullName": "Zainab Qureshi",
+        "phoneNumber": "+92 321 5551234",
+        "country": "Pakistan",
+        "address": "Gulberg III, Lahore",
+        "dateOfBirth": "1998-11-14",
+        "idNumber": "35201-9876543-1",
+        "role": "USER",
+        "isEmailVerified": false,
+        "kycStatus": "PENDING_REVIEW",
+        "twoFactorEnabled": false,
+        "isSuspended": false,
+        "createdAt": "2026-02-01T08:30:00.000Z",
+        "updatedAt": "2026-02-01T08:30:00.000Z"
+      }
+    ],
+    [
+      "u4000000-0000-0000-0000-000000000004",
+      {
+        "id": "u4000000-0000-0000-0000-000000000004",
+        "email": "adeebaansari085@gmail.com",
+        "username": "adeebaansari085",
+        "passwordHash": "1538ad4f785dee4c7b177e74a22393bf:5e291ce900b753413fd95b296813f95166d0f8f513037b9ef0310756facfea3a8660750b80b519dcd260925afa83020ed8902ab642769008d65950c46e7da962",
+        "fullName": "Adeeba Ansari",
+        "phoneNumber": "+92 300 1234567",
+        "country": "Pakistan",
+        "address": "Islamabad, Pakistan",
+        "dateOfBirth": "1998-05-15",
+        "idNumber": "61101-9876543-2",
+        "role": "USER",
+        "isEmailVerified": true,
+        "kycStatus": "APPROVED",
+        "twoFactorEnabled": false,
+        "isSuspended": false,
+        "createdAt": "2026-01-01T00:00:00.000Z",
+        "updatedAt": "2026-01-01T00:00:00.000Z"
+      }
+    ]
+  ],
+  "ledger": [
+    {
+      "id": "20e82fd0-a8d7-4944-8442-570bb73721d0",
+      "userId": "u2000000-0000-0000-0000-000000000002",
+      "type": "DEPOSIT",
+      "asset": "USDT",
+      "amount": 150,
+      "balanceAfter": 150,
+      "referenceId": "ed55cc62-5e3e-4e6a-b253-29b2983fb0ef",
+      "description": "Deposit 150.00 USDT via Polygon PoS [Simulated Sandbox]",
+      "createdAt": "2026-10-04T13:46:24.535Z"
+    },
+    {
+      "id": "baefa7fb-a750-47d5-bdd7-78830109e219",
+      "userId": "u2000000-0000-0000-0000-000000000002",
+      "type": "DEPOSIT",
+      "asset": "USDT",
+      "amount": 50,
+      "balanceAfter": 200,
+      "referenceId": "7061876a-04f0-4ccb-9e00-9afeace73e3b",
+      "description": "Deposit 50.00 USDT via Aptos Network",
+      "createdAt": "2026-10-04T13:46:24.536Z"
+    },
+    {
+      "id": "1d3e1b9e-a1d4-4fcf-96cc-d76c68ad4740",
+      "userId": "u2000000-0000-0000-0000-000000000002",
+      "type": "BONUS",
+      "asset": "USDT",
+      "amount": 1,
+      "balanceAfter": 201,
+      "referenceId": "b9d1f49d-a69a-424a-85bb-72b1284c7fab",
+      "description": "Verified Member Welcome Bonus ($1.00 USDT)",
+      "createdAt": "2026-10-04T13:46:24.537Z"
+    },
+    {
+      "id": "c6a4df01-73f0-4466-aa6d-0ca6d68ef010",
+      "userId": "u2000000-0000-0000-0000-000000000002",
+      "type": "REWARD",
+      "asset": "USDT",
+      "amount": 0.675,
+      "balanceAfter": 201.675,
+      "referenceId": "e398944e-acae-406b-ad8c-35520a76c68a",
+      "description": "Daily rewards accrued for Days 1-3 of $45 Growth Plan",
+      "createdAt": "2026-10-04T13:46:24.538Z"
+    },
+    {
+      "id": "b016fea9-00dc-4546-a74d-faf0a8cf061b",
+      "userId": "u2000000-0000-0000-0000-000000000002",
+      "type": "WITHDRAWAL",
+      "asset": "USDT",
+      "amount": -10,
+      "balanceAfter": 191.675,
+      "referenceId": "23d4a71c-8921-4302-a7a8-9cda5ceb6948",
+      "description": "Withdrawal of 10 USDT via Aptos Network to 0x8fa9c44b... (Pending Admin Confirmation)",
+      "idempotencyKey": "with_u2000000-0000-0000-0000-000000000002_1791121631367",
+      "createdAt": "2026-10-04T13:47:11.367Z"
+    },
+    {
+      "id": "cb269e8e-1b1c-4677-ac57-8d8e6ec8f93e",
+      "userId": "u2000000-0000-0000-0000-000000000002",
+      "type": "FEE",
+      "asset": "USDT",
+      "amount": -1.5,
+      "balanceAfter": 190.175,
+      "referenceId": "23d4a71c-8921-4302-a7a8-9cda5ceb6948",
+      "description": "Aptos Network network & platform fee for withdrawal 23d4a71c",
+      "createdAt": "2026-10-04T13:47:11.367Z"
+    }
+  ],
+  "transactions": [
+    {
+      "id": "23d4a71c-8921-4302-a7a8-9cda5ceb6948",
+      "userId": "u2000000-0000-0000-0000-000000000002",
+      "type": "WITHDRAWAL",
+      "asset": "USDT",
+      "network": "aptos",
+      "amount": 10,
+      "fee": 1.5,
+      "status": "PENDING",
+      "txHash": "0xpending_216de5a5cec95029e405045832f42f68a7b0c115",
+      "toAddress": "0x8fa9c44b36021fdb934ce3c8524a1b02de29ea75f458e0a1334c26788db3d4ee",
+      "destinationAddress": "0x8fa9c44b36021fdb934ce3c8524a1b02de29ea75f458e0a1334c26788db3d4ee",
+      "description": "Withdrawal to Aptos Network address 0x8fa9c44b... (Pending Admin Confirmation)",
+      "createdAt": "2026-10-04T13:47:11.368Z",
+      "updatedAt": "2026-10-04T13:47:11.368Z"
+    },
+    {
+      "id": "ed55cc62-5e3e-4e6a-b253-29b2983fb0ef",
+      "userId": "u2000000-0000-0000-0000-000000000002",
+      "type": "DEPOSIT",
+      "asset": "USDT",
+      "network": "polygon",
+      "amount": 150,
+      "fee": 0,
+      "status": "CONFIRMED",
+      "txHash": "0xdep_sim_polygon_981a2bc4e7d9834125f190e2908f1b98a72381",
+      "fromAddress": "0x3219482910482019482048102948201948201948",
+      "toAddress": "0xCryptic_Polygon_Vault_98213",
+      "confirmations": 24,
+      "requiredConfirmations": 20,
+      "description": "Deposit 150.00 USDT via Polygon",
+      "createdAt": "2026-01-17T09:12:00.000Z",
+      "updatedAt": "2026-01-17T09:15:00.000Z"
+    },
+    {
+      "id": "7061876a-04f0-4ccb-9e00-9afeace73e3b",
+      "userId": "u2000000-0000-0000-0000-000000000002",
+      "type": "DEPOSIT",
+      "asset": "USDT",
+      "network": "aptos",
+      "amount": 50,
+      "fee": 0,
+      "status": "CONFIRMED",
+      "txHash": "0xdep_sim_aptos_2019842a1b9487c908129841289c0912481920",
+      "fromAddress": "0x7a29e4bfd38b556f8f7c9e0a12b3c4d5e6f7a8b9",
+      "toAddress": "0xProfixa_Aptos_Vault_51234",
+      "confirmations": 18,
+      "requiredConfirmations": 10,
+      "description": "Deposit 50.00 USDT via Aptos",
+      "createdAt": "2026-01-18T14:30:00.000Z",
+      "updatedAt": "2026-01-18T14:32:00.000Z"
+    },
+    {
+      "id": "b9d1f49d-a69a-424a-85bb-72b1284c7fab",
+      "userId": "u2000000-0000-0000-0000-000000000002",
+      "type": "BONUS",
+      "asset": "USDT",
+      "amount": 1,
+      "fee": 0,
+      "status": "CONFIRMED",
+      "description": "Welcome Bonus credited upon KYC verification",
+      "createdAt": "2026-01-18T15:00:00.000Z",
+      "updatedAt": "2026-01-18T15:00:00.000Z"
+    }
+  ],
+  "rewardPlans": [
+    {
+      "id": "f54adc6b-1218-4698-9ae6-23299b6e6b77",
+      "name": "$5 Starter Reward Plan",
+      "amount": 5,
+      "asset": "USDT",
+      "cycleDays": 7,
+      "projectedRewardRatePercent": 120,
+      "totalReturn": 11,
+      "dailyReturn": 1.5714,
+      "scheduleDescription": "7-day cycle with daily claim return of $1.57/day (Total: $11.00)",
+      "minBalanceRequired": 5,
+      "status": "ACTIVE",
+      "maxActivePerUser": 5,
+      "riskNotice": "Platform rewards are generated from crypto market trading. We follow institutional capital preservation and risk management.",
+      "termsSummary": "Earn $1.57 daily over 7 days totaling $11.00 guaranteed returns.",
+      "createdAt": "2026-01-01T00:00:00.000Z",
+      "updatedAt": "2026-01-01T00:00:00.000Z"
+    },
+    {
+      "id": "761ee3fd-ced7-44af-9efe-aeef604837d9",
+      "name": "$10 Basic Reward Plan",
+      "amount": 10,
+      "asset": "USDT",
+      "cycleDays": 7,
+      "projectedRewardRatePercent": 120,
+      "totalReturn": 22,
+      "dailyReturn": 3.1428,
+      "scheduleDescription": "7-day cycle with daily claim return of $3.14/day (Total: $22.00)",
+      "minBalanceRequired": 10,
+      "status": "ACTIVE",
+      "maxActivePerUser": 5,
+      "riskNotice": "Platform rewards are generated from crypto market trading. We follow institutional capital preservation and risk management.",
+      "termsSummary": "Earn $3.14 daily over 7 days totaling $22.00 guaranteed returns.",
+      "createdAt": "2026-01-01T00:00:00.000Z",
+      "updatedAt": "2026-01-01T00:00:00.000Z"
+    },
+    {
+      "id": "f0e9da17-6c2f-4c02-b506-1a948ff86701",
+      "name": "$20 Standard Reward Plan",
+      "amount": 20,
+      "asset": "USDT",
+      "cycleDays": 14,
+      "projectedRewardRatePercent": 140,
+      "totalReturn": 48,
+      "dailyReturn": 3.4285,
+      "scheduleDescription": "14-day cycle with daily claim return of $3.43/day (Total: $48.00)",
+      "minBalanceRequired": 20,
+      "status": "ACTIVE",
+      "maxActivePerUser": 5,
+      "riskNotice": "Platform rewards are generated from crypto market trading. We follow institutional capital preservation and risk management.",
+      "termsSummary": "Earn $3.43 daily over 14 days totaling $48.00 guaranteed returns.",
+      "createdAt": "2026-01-01T00:00:00.000Z",
+      "updatedAt": "2026-01-01T00:00:00.000Z"
+    },
+    {
+      "id": "5546eb84-7f60-48a7-ab4f-1c3d4dcddd46",
+      "name": "$45 Growth Reward Plan",
+      "amount": 45,
+      "asset": "USDT",
+      "cycleDays": 14,
+      "projectedRewardRatePercent": 150,
+      "totalReturn": 112.5,
+      "dailyReturn": 8.0357,
+      "scheduleDescription": "14-day cycle with daily claim return of $8.04/day (Total: $112.50)",
+      "minBalanceRequired": 45,
+      "status": "ACTIVE",
+      "maxActivePerUser": 5,
+      "riskNotice": "Platform rewards are generated from crypto market trading. We follow institutional capital preservation and risk management.",
+      "termsSummary": "Earn $8.04 daily over 14 days totaling $112.50 guaranteed returns.",
+      "createdAt": "2026-01-01T00:00:00.000Z",
+      "updatedAt": "2026-01-01T00:00:00.000Z"
+    },
+    {
+      "id": "a1914ec3-fc04-4fe7-9237-30a322790e11",
+      "name": "$75 Advanced Reward Plan",
+      "amount": 75,
+      "asset": "USDT",
+      "cycleDays": 21,
+      "projectedRewardRatePercent": 170,
+      "totalReturn": 202.5,
+      "dailyReturn": 9.6428,
+      "scheduleDescription": "21-day cycle with daily claim return of $9.64/day (Total: $202.50)",
+      "minBalanceRequired": 75,
+      "status": "ACTIVE",
+      "maxActivePerUser": 5,
+      "riskNotice": "Platform rewards are generated from crypto market trading. We follow institutional capital preservation and risk management.",
+      "termsSummary": "Earn $9.64 daily over 21 days totaling $202.50 guaranteed returns.",
+      "createdAt": "2026-01-01T00:00:00.000Z",
+      "updatedAt": "2026-01-01T00:00:00.000Z"
+    },
+    {
+      "id": "0525b128-5761-49a8-9838-d31d82722ef4",
+      "name": "$100 Premier Reward Plan",
+      "amount": 100,
+      "asset": "USDT",
+      "cycleDays": 30,
+      "projectedRewardRatePercent": 200,
+      "totalReturn": 300,
+      "dailyReturn": 10,
+      "scheduleDescription": "30-day cycle with daily claim return of $10.00/day (Total: $300.00)",
+      "minBalanceRequired": 100,
+      "status": "ACTIVE",
+      "maxActivePerUser": 5,
+      "riskNotice": "Platform rewards are generated from crypto market trading. We follow institutional capital preservation and risk management.",
+      "termsSummary": "Earn $10.00 daily over 30 days totaling $300.00 guaranteed returns.",
+      "createdAt": "2026-01-01T00:00:00.000Z",
+      "updatedAt": "2026-01-01T00:00:00.000Z"
+    },
+    {
+      "id": "33c4ab0a-e526-46fe-92b4-eb95d136cd67",
+      "name": "$500 Institutional Reward Plan",
+      "amount": 500,
+      "asset": "USDT",
+      "cycleDays": 30,
+      "projectedRewardRatePercent": 250,
+      "totalReturn": 1750,
+      "dailyReturn": 58.3333,
+      "scheduleDescription": "30-day cycle with daily claim return of $58.33/day (Total: $1750.00)",
+      "minBalanceRequired": 500,
+      "status": "ACTIVE",
+      "maxActivePerUser": 5,
+      "riskNotice": "Platform rewards are generated from crypto market trading. We follow institutional capital preservation and risk management.",
+      "termsSummary": "Earn $58.33 daily over 30 days totaling $1750.00 guaranteed returns.",
+      "createdAt": "2026-01-01T00:00:00.000Z",
+      "updatedAt": "2026-01-01T00:00:00.000Z"
+    }
+  ],
+  "userPlans": [
+    {
+      "id": "e398944e-acae-406b-ad8c-35520a76c68a",
+      "userId": "u2000000-0000-0000-0000-000000000002",
+      "planId": "5546eb84-7f60-48a7-ab4f-1c3d4dcddd46",
+      "planName": "$45 Growth Reward Plan",
+      "amount": 45,
+      "asset": "USDT",
+      "startDate": "2026-01-19T00:00:00.000Z",
+      "endDate": "2026-02-02T00:00:00.000Z",
+      "cycleDays": 14,
+      "daysCompleted": 3,
+      "totalRewardAccrued": 0.675,
+      "status": "ACTIVE",
+      "dailyRewards": [
+        {
+          "day": 1,
+          "amount": 0.225,
+          "status": "COMPLETED",
+          "claimedAt": "2026-01-20T12:00:00.000Z"
+        },
+        {
+          "day": 2,
+          "amount": 0.225,
+          "status": "COMPLETED",
+          "claimedAt": "2026-01-20T12:00:00.000Z"
+        },
+        {
+          "day": 3,
+          "amount": 0.225,
+          "status": "COMPLETED",
+          "claimedAt": "2026-01-20T12:00:00.000Z"
+        },
+        {
+          "day": 4,
+          "amount": 0.225,
+          "status": "AVAILABLE"
+        },
+        {
+          "day": 5,
+          "amount": 0.225,
+          "status": "LOCKED"
+        },
+        {
+          "day": 6,
+          "amount": 0.225,
+          "status": "LOCKED"
+        },
+        {
+          "day": 7,
+          "amount": 0.225,
+          "status": "LOCKED"
+        },
+        {
+          "day": 8,
+          "amount": 0.225,
+          "status": "LOCKED"
+        },
+        {
+          "day": 9,
+          "amount": 0.225,
+          "status": "LOCKED"
+        },
+        {
+          "day": 10,
+          "amount": 0.225,
+          "status": "LOCKED"
+        },
+        {
+          "day": 11,
+          "amount": 0.225,
+          "status": "LOCKED"
+        },
+        {
+          "day": 12,
+          "amount": 0.225,
+          "status": "LOCKED"
+        },
+        {
+          "day": 13,
+          "amount": 0.225,
+          "status": "LOCKED"
+        },
+        {
+          "day": 14,
+          "amount": 0.225,
+          "status": "LOCKED"
+        }
+      ],
+      "createdAt": "2026-01-19T00:00:00.000Z"
+    }
+  ],
+  "kycRecords": [
+    [
+      "u2000000-0000-0000-0000-000000000002",
+      {
+        "userId": "u2000000-0000-0000-0000-000000000002",
+        "fullName": "Demo Trader",
+        "dateOfBirth": "1995-08-20",
+        "country": "Pakistan",
+        "idNumber": "61101-1234567-8",
+        "address": "House 42, Sector F-7/2, Islamabad",
+        "status": "APPROVED",
+        "documents": {
+          "idFrontUrl": "https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?w=600&auto=format&fit=crop&q=80",
+          "idBackUrl": "https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?w=600&auto=format&fit=crop&q=80",
+          "selfieUrl": "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=600&auto=format&fit=crop&q=80",
+          "uploadedAt": "2026-01-16T12:00:00.000Z",
+          "adminNotes": "Government CNIC verified against national database. Photo and selfie match approved.",
+          "reviewedBy": "admin@cryptic.io",
+          "reviewedAt": "2026-01-16T14:30:00.000Z"
+        },
+        "submittedAt": "2026-01-16T12:00:00.000Z",
+        "updatedAt": "2026-01-16T14:30:00.000Z"
+      }
+    ],
+    [
+      "u3000000-0000-0000-0000-000000000003",
+      {
+        "userId": "u3000000-0000-0000-0000-000000000003",
+        "fullName": "Zainab Qureshi",
+        "dateOfBirth": "1998-11-14",
+        "country": "Pakistan",
+        "idNumber": "35201-9876543-1",
+        "address": "Gulberg III, Lahore",
+        "status": "PENDING_REVIEW",
+        "documents": {
+          "idFrontUrl": "https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?w=600&auto=format&fit=crop&q=80",
+          "idBackUrl": "https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?w=600&auto=format&fit=crop&q=80",
+          "selfieUrl": "https://images.unsplash.com/photo-1580489944761-15a19d654956?w=600&auto=format&fit=crop&q=80",
+          "uploadedAt": "2026-02-01T08:45:00.000Z"
+        },
+        "submittedAt": "2026-02-01T08:45:00.000Z",
+        "updatedAt": "2026-02-01T08:45:00.000Z"
+      }
+    ]
+  ],
+  "connectedWallets": [
+    {
+      "id": "b1536952-3808-4a9a-9bb6-5011295b0c56",
+      "asset": "USDT",
+      "network": "polygon",
+      "address": "0x71C8389320b92384238592398459203810294820",
+      "label": "Primary Hardware Ledger (Polygon)",
+      "isDefault": true,
+      "addedAt": "2026-01-17T11:00:00.000Z"
+    }
+  ],
+  "notifications": [
+    {
+      "id": "0acfd159-0012-4c8a-ac71-5544f4af58c2",
+      "userId": "u2000000-0000-0000-0000-000000000002",
+      "title": "Withdrawal Submitted for Admin Confirmation",
+      "message": "Your withdrawal request of 10 USDT via Aptos Network has been placed. Balance is locked and will be dispatched once confirmed by Admin.",
+      "type": "WITHDRAWAL",
+      "isRead": false,
+      "createdAt": "2026-10-04T13:47:11.368Z",
+      "link": "/dashboard/wallet"
+    },
+    {
+      "id": "dd978bf6-c2be-48f6-ae41-08e5a80ae961",
+      "userId": "u2000000-0000-0000-0000-000000000002",
+      "title": "Daily Reward Available",
+      "message": "Day 4 reward is now available to claim in your Daily Reward Hub.",
+      "type": "REWARD",
+      "isRead": false,
+      "createdAt": "2026-10-04T13:46:24.538Z",
+      "link": "/dashboard/rewards"
+    },
+    {
+      "id": "e93eec27-b41b-41ce-8919-8f25607f133a",
+      "userId": "u2000000-0000-0000-0000-000000000002",
+      "title": "Deposit Confirmed: 150.00 USDT",
+      "message": "Your Polygon network deposit has achieved required confirmations.",
+      "type": "DEPOSIT",
+      "isRead": false,
+      "createdAt": "2026-10-04T13:46:24.538Z",
+      "link": "/dashboard/wallet"
+    },
+    {
+      "id": "7ba55aff-81ff-4ba1-84b3-f1dae436c0e4",
+      "userId": "u2000000-0000-0000-0000-000000000002",
+      "title": "Identity Verification Approved",
+      "message": "Your KYC documents have been reviewed and approved by compliance.",
+      "type": "KYC",
+      "isRead": false,
+      "createdAt": "2026-10-04T13:46:24.538Z",
+      "link": "/dashboard/kyc"
+    }
+  ],
+  "auditLogs": [
+    {
+      "id": "7636d945-f425-4dc1-b819-9423d4a2e70e",
+      "adminId": "a1000000-0000-0000-0000-000000000001",
+      "adminEmail": "admin@cryptic.io",
+      "action": "PLAN_CREATED",
+      "targetType": "RewardPlan",
+      "targetId": "5546eb84-7f60-48a7-ab4f-1c3d4dcddd46",
+      "afterState": "{\"id\":\"5546eb84-7f60-48a7-ab4f-1c3d4dcddd46\",\"name\":\"$45 Growth Reward Plan\",\"amount\":45,\"asset\":\"USDT\",\"cycleDays\":14,\"projectedRewardRatePercent\":150,\"totalReturn\":112.5,\"dailyReturn\":8.0357,\"scheduleDescription\":\"14-day cycle with daily claim return of $8.04/day (Total: $112.50)\",\"minBalanceRequired\":45,\"status\":\"ACTIVE\",\"maxActivePerUser\":5,\"riskNotice\":\"Platform rewards are generated from crypto market trading. We follow institutional capital preservation and risk management.\",\"termsSummary\":\"Earn $8.04 daily over 14 days totaling $112.50 guaranteed returns.\",\"createdAt\":\"2026-01-01T00:00:00.000Z\",\"updatedAt\":\"2026-01-01T00:00:00.000Z\"}",
+      "ipAddress": "127.0.0.1",
+      "metadata": {
+        "planAmount": 45,
+        "cycle": 14
+      },
+      "createdAt": "2026-10-04T13:46:24.539Z"
+    },
+    {
+      "id": "29ade6dc-91eb-417d-94fa-461596c78332",
+      "adminId": "a1000000-0000-0000-0000-000000000001",
+      "adminEmail": "admin@cryptic.io",
+      "action": "KYC_APPROVAL",
+      "targetType": "User",
+      "targetId": "u2000000-0000-0000-0000-000000000002",
+      "beforeState": "PENDING_REVIEW",
+      "afterState": "APPROVED",
+      "ipAddress": "127.0.0.1",
+      "metadata": {
+        "reviewerNotes": "Documents verified with national authority."
+      },
+      "createdAt": "2026-10-04T13:46:24.539Z"
+    }
+  ],
+  "supportTickets": [],
+  "legalPages": [
+    [
+      "privacy-policy",
+      {
+        "slug": "privacy-policy",
+        "titleEn": "Privacy Policy",
+        "titleUr": "رازداری کی پالیسی",
+        "version": "2.4",
+        "lastUpdated": "2026-09-01T00:00:00.000Z",
+        "contentEn": "### 1. Introduction\nProfixa (\"we\", \"our\", or \"the Platform\") is committed to protecting your personal data and digital privacy. This Privacy Policy details how we gather, process, store, and safeguard your data when utilizing our crypto reward management services.\n\n### 2. Information We Collect\nWe collect information strictly necessary to provide financial ledger and reward services:\n- Identity Information: Full legal name, date of birth, nationality, government identification numbers (CNIC, Passport, National ID).\n- Contact Data: Verified email address and phone number.\n- Financial & Blockchain Data: Public wallet addresses, transaction hashes, ledger histories, deposit references, and reward claims.\n\n### 3. Identity Verification & KYC\nTo adhere to worldwide Anti-Money Laundering (AML) and Counter-Terrorist Financing (CTF) directives, we require government ID documentation (official ID card front). All uploaded identity documents are stored in encrypted, non-public vaults with strict role-based access.\n\n### 4. Data Security & Storage Architecture\nAll financial ledger balances are maintained through immutable, double-entry bookkeeping. We apply TLS 1.3 encryption in transit, AES-256 encryption at rest, and zero-knowledge storage principles for sensitive credential vectors.\n\n### 5. User Rights & Contact\nYou have the right to inspect, correct, and request export of your stored personal and ledger information. For inquiries, contact compliance@profixa.com.",
+        "contentUr": "### 1. تعارف\nپروفیکسا (Profixa) آپ کے ذاتی ڈیٹا اور ڈیجیٹل رازداری کے تحفظ کے لیے پرعزم ہے۔ یہ رازداری کی پالیسی بیان کرتی ہے کہ ہم آپ کی معلومات کیسے جمع، محفوظ اور استعمال کرتے ہیں۔\n\n### 2. جمع کی جانے والی معلومات\nہم پلیٹ فارم کے مالیاتی لیجر اور انعامات کی خدمات کے لیے صرف ضروری ڈیٹا حاصل کرتے ہیں:\n- شناختی معلومات: قانونی نام، تاریخ پیدائش، شہریت اور شناختی کارڈ/پاسپورٹ نمبر۔\n- رابطے کا ڈیٹا: تصدیق شدہ ای میل اور فون نمبر۔\n- بلاک چین ڈیٹا: پبلک والیٹ ایڈریس، ٹرانزیکشن ہیشز اور لیجر ریکارڈز۔\n\n### 3. شناختی تصدیق اور تحفظ\nعالمی اینٹی منی لانڈرنگ (AML) ضوابط کے تحت شناختی دستاویزات کا جائزہ لیا جاتا ہے۔ تمام دستاویزات جدید ترین انکرپشن کے ساتھ محفوظ رکھی جاتی ہیں۔"
+      }
+    ],
+    [
+      "terms-and-conditions",
+      {
+        "slug": "terms-and-conditions",
+        "titleEn": "Terms & Conditions",
+        "titleUr": "قواعد و ضوابط",
+        "version": "3.1",
+        "lastUpdated": "2026-09-01T00:00:00.000Z",
+        "contentEn": "### 1. Acceptance of Terms\nBy creating an account or accessing Profixa, you expressly agree to abide by these Terms and Conditions and all applicable regulatory disclosures.\n\n### 2. Non-Guaranteed Rewards Policy\nImportant Disclosure: Platform rewards are calculated based on configured reward parameters and platform operational rules. REWARDS ARE NOT GUARANTEED FINANCIAL RETURNS OR INTEREST. Reward calculations are governed by backend rules subject to platform solvency and compliance checks.\n\n### 3. Ledger Source of Truth\nThe internal immutable double-entry ledger constitutes the single source of truth for all user account balances. In the event of network forks, chain re-organizations, or synchronization delays, the audited ledger takes precedence.\n\n### 4. Withdrawals & Anti-Fraud Protection\nWithdrawals undergo automated security auditing and may require compliance verification. The platform reserves the right to freeze accounts involved in malicious activities or double-spending exploits.",
+        "contentUr": "### 1. شرائط کی منظوری\nپروفیکسا (Profixa) پر اکاؤنٹ بنا کر آپ ان تمام شرائط اور پالیسیوں کی پابندی کا اقرار کرتے ہیں۔\n\n### 2. انعامات کا طریقہ کار اور تنبیہ\nاہم تنبیہ: پلیٹ فارم انعامات طے شدہ شیڈول اور شرائط کے تابع ہیں۔ یہ کسی قسم کا گارنٹی شدہ منافع یا سود نہیں ہے۔ تمام انعامات ایڈمن اور سسٹم پیرامیٹرز کے مطابق تقسیم کیے جاتے ہیں۔\n\n### 3. لیجر کی خودمختاری\nہمارا آڈٹ شدہ ڈبل انٹری لیجر تمام بیلنس اور حساب کتاب کی بنیاد ہے۔ کسی تنازعہ کی صورت میں لیجر ریکارڈ قطعی تسلیم ہوگا۔"
+      }
+    ],
+    [
+      "trading-profit-policy",
+      {
+        "slug": "trading-profit-policy",
+        "titleEn": "Crypto Trading & Profit Distribution Policy",
+        "titleUr": "کرپٹو ٹریڈنگ اور منافع کی تقسیم کی پالیسی",
+        "version": "1.0",
+        "lastUpdated": "2026-09-25T00:00:00.000Z",
+        "contentEn": "### 1. Platform Capital Deployment & Crypto Trading Strategy\nAt Profixa, all user funds committed to active reward plans are pooled and deployed directly into professional, institutional-grade cryptocurrency market trading operations. \n\nOur proprietary trading engine utilizes:\n- **Spot Market Trading:** Algorithmic execution across major liquidity venues for high-volume digital assets.\n- **Cross-Exchange Arbitrage:** Real-time price disparity capture between tier-1 exchanges.\n- **Automated Market Making (AMM):** Liquidity deployment into decentralized protocols to harvest trading fee spreads.\n\n### 2. Profit Sharing & Daily Reward Distribution\nAll net profits generated from our market trading activities are calculated and distributed back directly to user accounts according to their chosen plan schedule:\n- **$5 Starter Plan:** Yields a total return of **$11.00** at the end of the 7-day cycle via daily claimable payouts ($1.5714/day).\n- **Proportional Scaling:** Every subsequent tier provides enhanced returns corresponding to cycle duration.\n- **Immediate Start:** Daily reward claims begin immediately on Day 1 upon activating any plan.\n\n### 3. Guaranteed Reserve & Strict Risk Management\nWhile rewards are structured as guaranteed platform payouts backed by our platform reserve liquidity fund, our quantitative trading team strictly enforces disciplined risk management protocols:\n- **Capital Preservation First:** Maximum risk per individual trade position is strictly capped at 1.5% of total capital.\n- **Automated Stop-Loss Limits:** Algorithmic stop-losses are hard-coded into all order executions.\n- **Multi-Signature Cold Vaults:** 85%+ of platform reserves are stored in cold storage multi-sig vaults, insulated from hot-wallet exchange exposure.",
+        "contentUr": "### 1. صارفین کے سرمائے کی کرپٹو ٹریڈنگ کا طریقہ کار\nپروفیکسا (Profixa) پر صارفین جو بھی رقم پلان میں شامل کرتے ہیں، اس سرمائے سے ہم پروفیشنل کرپٹو مارکیٹ ٹریڈنگ کرتے ہیں۔\n\nہماری ٹریڈنگ اسٹریٹجی میں شامل ہیں:\n- **اسپاٹ اور ڈیجیٹل اثاثہ ٹریڈنگ:** اہم ایکسچینجز پر ہائی والیم اور محفوظ کرپٹو کوائنز میں ٹریڈنگ۔\n- **کرپٹو آربٹریج (Arbitrage):** مختلف عالمی ایکسچینجز کے درمیان ریٹس کے فرق سے منافع کمانا۔\n- **لیکویڈیٹی اور مارکیٹ میکنگ:** فیس اور ٹریڈنگ اسپریڈز سے مستقل آمدن پیدا کرنا۔\n\n### 2. منافع کی روزانہ واپسی اور شیڈول\nاس کرپٹو ٹریڈنگ سے جو بھی منافع حاصل ہوتا ہے، وہ ہم روزانہ کی بنیاد پر آپ کے اکاؤنٹ میں کریڈٹ کرتے ہیں:\n- **$5 اسٹارٹر پلان:** 7 دنوں (ہفتے کے اختتام) پر آپ کو کل **$11.00** کا ریٹرن ملتا ہے (روزانہ $1.5714 کا کلیم)۔\n- **فوری آغاز:** جس دن آپ پلان ایکٹیو کریں گے، اسی دن سے آپ کا پہلا دن شروع ہو جائے گا اور ڈیلی کلیم دستیاب ہوگا۔\n\n### 3. گارنٹیڈ ریوارڈز اور رسک مینجمنٹ (Risk Management)\nاگرچہ آپ کے پلان ریوارڈز ہمارے پلیٹ فارم کے مخصوص ریزرو فنڈ کی مدد سے گارنٹیڈ ہیں، لیکن ہم اپنے سسٹم میں رسک مینجمنٹ کے سخت ترین اصول فالو کرتے ہیں:\n- **اسٹاپ لاس کی پابندی:** کسی بھی ٹریڈ میں سرمایہ ضائع ہونے سے بچانے کے لیے خودکار حفاظتی رکاوٹیں لاگو ہیں۔\n- **محفوظ کولڈ والٹس:** پلیٹ فارم کا 85 فیصد سے زائد فنڈ ملٹی سگ کولڈ والٹس میں محفوظ رکھا جاتا ہے۔"
+      }
+    ]
+  ],
+  "welcomeBonuses": [
+    [
+      "u2000000-0000-0000-0000-000000000002",
+      {
+        "id": "b9d1f49d-a69a-424a-85bb-72b1284c7fab",
+        "userId": "u2000000-0000-0000-0000-000000000002",
+        "amount": 1,
+        "asset": "USDT",
+        "status": "CLAIMED",
+        "claimedAt": "2026-01-18T15:00:00.000Z"
+      }
+    ]
+  ],
+  "idempotencyKeys": [
+    "with_u2000000-0000-0000-0000-000000000002_1791121631367"
+  ],
+  "systemSettings": {
+    "maintenanceMode": false,
+    "allowNewRegistrations": true,
+    "minDepositUSDT": 5,
+    "minDepositUSDC": 5,
+    "withdrawalPlatformFeeUSDT": 1,
+    "withdrawalPlatformFeeUSDC": 1,
+    "requireAdminWithdrawalApproval": false,
+    "blockchainProviderMode": "mock",
+    "depositAddresses": {
+      "trx": "TF87mPXTDpV3d6CTJ4x8Ubzy3e2gJirJNe",
+      "bep20": "0x2Edb4F3f21ab754d78EC66dF0e1DCf7E4B8bCC85",
+      "ethereum": "0x2Edb4F3f21ab754d78EC66dF0e1DCf7E4B8bCC85",
+      "aptos": "0x8fa9c44b36021fdb934ce3c8524a1b02de29ea75f458e0a1334c26788db3d4ee"
+    },
+    "welcomeBonusConfig": {
+      "isEnabled": true,
+      "maxAmount": 1,
+      "requiresKYC": true,
+      "requiresEmailVerification": true,
+      "minDepositRequired": 0,
+      "description": "Up to $1.00 platform bonus — subject to eligibility and verification."
+    }
+  }
+}
