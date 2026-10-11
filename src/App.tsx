@@ -31,20 +31,40 @@ import { AdminAuditLogs } from './components/admin/AdminAuditLogs';
 import { AdminSettings } from './components/admin/AdminSettings';
 
 const AppContent: React.FC = () => {
-  const { isAuthenticated, user } = useAuth();
+  const { isAuthenticated, user, isLoading, token } = useAuth();
   const { isRtl } = useTranslation();
 
-  // Navigation state
-  const [activeView, setActiveView] = useState<string>('dashboard');
+  // Navigation state - persisted in localStorage so browser refreshes preserve active page
+  const [activeView, setActiveView] = useState<string>(() => {
+    try {
+      return localStorage.getItem('profixa_active_view') || 'dashboard';
+    } catch {
+      return 'dashboard';
+    }
+  });
   const [authModalMode, setAuthModalMode] = useState<'LOGIN' | 'REGISTER' | null>(null);
   const [isSidebarOpen, setIsSidebarOpen] = useState<boolean>(false);
   const [legalSlug, setLegalSlug] = useState<string>('privacy-policy');
 
-  // When an admin signs in, land directly on Admin Users Desk
+  const handleSelectView = (view: string) => {
+    setActiveView(view);
+    try {
+      localStorage.setItem('profixa_active_view', view);
+    } catch {}
+  };
+
+  // When an admin signs in, land on admin view if not already on an admin view
   React.useEffect(() => {
     if (user?.role === 'SUPER_ADMIN' || user?.role === 'ADMIN') {
-      if (activeView === 'dashboard' || !activeView.startsWith('admin-')) {
-        setActiveView('admin-users');
+      try {
+        const saved = localStorage.getItem('profixa_active_view');
+        if (!saved || saved === 'dashboard' || !saved.startsWith('admin-')) {
+          handleSelectView('admin-users');
+        } else {
+          setActiveView(saved);
+        }
+      } catch {
+        handleSelectView('admin-users');
       }
     }
   }, [user?.role]);
@@ -67,6 +87,18 @@ const AppContent: React.FC = () => {
     setLegalSlug(slug);
     setActiveView('legal');
   };
+
+  // While checking an existing auth token on page load/refresh, avoid flashing the landing page
+  if (isLoading && token) {
+    return (
+      <div className="min-h-screen bg-[#FAF7F5] flex flex-col items-center justify-center p-4">
+        <div className="w-12 h-12 rounded-2xl bg-[#451A03] text-white flex items-center justify-center font-black text-xl mb-3 shadow-md animate-pulse">
+          P
+        </div>
+        <p className="text-xs font-bold text-slate-700">Verifying secure session...</p>
+      </div>
+    );
+  }
 
   // If unauthenticated, render the Public Landing Page & Auth Modal in crisp white
   if (!isAuthenticated) {
@@ -104,7 +136,7 @@ const AppContent: React.FC = () => {
       <Sidebar
         activeView={activeView}
         onSelectView={(view) => {
-          setActiveView(view);
+          handleSelectView(view);
           setIsSidebarOpen(false);
         }}
         isOpen={isSidebarOpen}
@@ -118,16 +150,16 @@ const AppContent: React.FC = () => {
         <TopHeader
           onToggleMobileSidebar={() => setIsSidebarOpen((prev) => !prev)}
           onToggleMobileNav={() => setIsSidebarOpen((prev) => !prev)}
-          onNavigate={(view) => setActiveView(view)}
+          onNavigate={(view) => handleSelectView(view)}
         />
 
         <main className="flex-1 p-4 sm:p-6 lg:p-8 max-w-7xl w-full mx-auto">
           {/* User views */}
-          {activeView === 'dashboard' && <UserDashboard onNavigate={setActiveView} />}
+          {activeView === 'dashboard' && <UserDashboard onNavigate={handleSelectView} />}
           {activeView === 'plans' && <PlansView />}
           {activeView === 'rewards' && <RewardsView />}
           {activeView === 'wallet' && <WalletView />}
-          {activeView === 'referrals' && <ReferralView onNavigate={setActiveView} />}
+          {activeView === 'referrals' && <ReferralView onNavigate={handleSelectView} />}
           {activeView === 'transactions' && <TransactionsView />}
           {activeView === 'kyc' && <KYCView />}
           {activeView === 'profile' && <ProfileView />}

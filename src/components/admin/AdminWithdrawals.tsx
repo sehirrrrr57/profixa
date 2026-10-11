@@ -3,14 +3,15 @@ import { api } from '../../lib/api';
 import { Button } from '../ui/Button';
 import { Badge } from '../ui/Badge';
 import { useToast } from '../ui/Toast';
-import { ArrowUpRight, Check, X, RefreshCw, AlertCircle, Clock } from 'lucide-react';
+import { ArrowUpRight, Check, X, RefreshCw, AlertCircle, Clock, Copy } from 'lucide-react';
 
 export const AdminWithdrawals: React.FC = () => {
   const { showToast } = useToast();
   const [withdrawals, setWithdrawals] = useState<any[]>([]);
-  const [filter, setFilter] = useState<'ALL' | 'PENDING' | 'CONFIRMED' | 'REJECTED'>('PENDING');
+  const [filter, setFilter] = useState<'ALL' | 'PENDING' | 'CONFIRMED' | 'REJECTED'>('ALL');
   const [isProcessing, setIsProcessing] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [copiedId, setCopiedId] = useState<string | null>(null);
 
   const loadWithdrawals = async () => {
     setIsLoading(true);
@@ -21,6 +22,18 @@ export const AdminWithdrawals: React.FC = () => {
       console.warn('Failed to load withdrawals:', err);
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const handleCopyAddress = async (addr: string, id: string) => {
+    if (!addr || addr === 'N/A') return;
+    try {
+      await navigator.clipboard.writeText(addr);
+      setCopiedId(id);
+      showToast('success', 'Address Copied', 'Withdrawal destination address copied to clipboard.');
+      setTimeout(() => setCopiedId(null), 3000);
+    } catch (err) {
+      showToast('error', 'Copy failed', 'Please copy manually.');
     }
   };
 
@@ -51,6 +64,15 @@ export const AdminWithdrawals: React.FC = () => {
   });
 
   const pendingCount = withdrawals.filter((tx) => tx.status === 'PENDING').length;
+  const confirmedCount = withdrawals.filter((tx) => tx.status === 'CONFIRMED').length;
+  const rejectedCount = withdrawals.filter((tx) => tx.status === 'REJECTED').length;
+
+  const tabLabels: Record<'ALL' | 'PENDING' | 'CONFIRMED' | 'REJECTED', string> = {
+    ALL: `All (${withdrawals.length})`,
+    PENDING: `Pending (${pendingCount})`,
+    CONFIRMED: `Confirmed (${confirmedCount})`,
+    REJECTED: `Rejected (${rejectedCount})`,
+  };
 
   return (
     <div className="space-y-6 pb-12">
@@ -87,8 +109,8 @@ export const AdminWithdrawals: React.FC = () => {
       </div>
 
       {/* Filter Tabs */}
-      <div className="flex rounded-xl bg-white p-1 border border-[#EADBCE] shadow-2xs max-w-md gap-1">
-        {(['PENDING', 'CONFIRMED', 'REJECTED', 'ALL'] as const).map((tab) => (
+      <div className="flex rounded-xl bg-white p-1 border border-[#EADBCE] shadow-2xs max-w-lg gap-1">
+        {(['ALL', 'PENDING', 'CONFIRMED', 'REJECTED'] as const).map((tab) => (
           <button
             key={tab}
             type="button"
@@ -99,7 +121,7 @@ export const AdminWithdrawals: React.FC = () => {
                 : 'text-slate-600 hover:text-slate-900 hover:bg-[#FDF8F5]'
             }`}
           >
-            {tab === 'PENDING' ? `Pending (${pendingCount})` : tab.charAt(0) + tab.slice(1).toLowerCase()}
+            {tabLabels[tab]}
           </button>
         ))}
       </div>
@@ -140,8 +162,35 @@ export const AdminWithdrawals: React.FC = () => {
                     <td className="py-3.5 px-4 font-black text-rose-600 text-sm">
                       ${tx.amount.toFixed(2)}
                     </td>
-                    <td className="py-3.5 px-4 font-mono text-[11px] text-slate-600 max-w-[180px] truncate" title={tx.destinationAddress || tx.toAddress}>
-                      {tx.destinationAddress || tx.toAddress || 'N/A'}
+                    <td className="py-3.5 px-4">
+                      <div className="flex items-center gap-1.5">
+                        <span
+                          className="font-mono text-[11px] text-slate-800 bg-[#FAF7F5] px-2 py-1 rounded-md border border-[#EADBCE] max-w-[210px] truncate select-all"
+                          title={tx.destinationAddress || tx.toAddress || 'N/A'}
+                        >
+                          {tx.destinationAddress || tx.toAddress || 'N/A'}
+                        </span>
+                        {(tx.destinationAddress || tx.toAddress) && (
+                          <button
+                            type="button"
+                            onClick={() => handleCopyAddress(tx.destinationAddress || tx.toAddress, tx.id)}
+                            className="inline-flex items-center gap-1 px-2 py-1 rounded-md bg-white border border-[#EADBCE] hover:border-[#451A03] hover:text-[#451A03] text-slate-700 font-bold text-[10px] transition-colors shadow-2xs cursor-pointer shrink-0"
+                            title="Copy destination address to clipboard"
+                          >
+                            {copiedId === tx.id ? (
+                              <>
+                                <Check className="w-3.5 h-3.5 text-emerald-600" />
+                                <span className="text-emerald-600 font-bold">Copied!</span>
+                              </>
+                            ) : (
+                              <>
+                                <Copy className="w-3.5 h-3.5 text-[#451A03]" />
+                                <span>Copy</span>
+                              </>
+                            )}
+                          </button>
+                        )}
+                      </div>
                     </td>
                     <td className="py-3.5 px-4">
                       <Badge

@@ -5,7 +5,7 @@ import { Button } from '../ui/Button';
 import { Badge } from '../ui/Badge';
 import { useToast } from '../ui/Toast';
 import { api } from '../../lib/api';
-import { Award, Flame, Gift, CheckCircle2, Clock, Sparkles, AlertCircle, TrendingUp } from 'lucide-react';
+import { Award, Flame, Gift, CheckCircle2, Clock, Sparkles, AlertCircle, TrendingUp, ShieldCheck } from 'lucide-react';
 
 export const RewardsView: React.FC = () => {
   const { refreshBalances } = useAuth();
@@ -169,24 +169,23 @@ export const RewardsView: React.FC = () => {
         )}
       </div>
 
-      {/* Welcome Bonus Information Box */}
+      {/* Platform Rewards Security Assurance */}
       <div className="bg-white rounded-2xl border border-[#EADBCE] p-6 shadow-2xs flex flex-col sm:flex-row sm:items-center justify-between gap-6">
         <div className="flex items-start gap-4">
           <div className="w-12 h-12 rounded-2xl bg-[#FDF8F5] border border-[#EADBCE] text-[#451A03] flex items-center justify-center shrink-0">
-            <Gift className="w-6 h-6 text-[#451A03]" />
+            <ShieldCheck className="w-6 h-6 text-[#451A03]" />
           </div>
           <div>
             <div className="flex items-center gap-2">
               <h4 className="text-base font-bold text-slate-900">
-                $1.00 Welcome Registration Bonus
+                {isUrdu ? 'شفاف لیجر اور روزانہ ادائیگی' : 'Transparent Ledger & Daily Settlement'}
               </h4>
-              <Badge variant="success" size="sm" dot>Credited</Badge>
+              <Badge variant="success" size="sm" dot>Live Protocol</Badge>
             </div>
             <p className="text-xs text-slate-600 mt-1 max-w-xl">
-              Every registered user receives a $1.00 USDT welcome bonus. Note: This bonus is safely saved in your account balance and unlocks for withdrawal once you activate at least one earning plan.
-            </p>
-            <p className="text-[11px] text-[#5C2B14] font-semibold mt-1" dir={isUrdu ? 'rtl' : 'ltr'}>
-              اہم نوٹ: یہ بونس صرف تب ودڈرا ہو سکے گا جب آپ کوئی ایک پلان ایکٹیو کریں گے۔
+              {isUrdu
+                ? 'تمام کلیم کیے گئے ریوارڈز فوری طور پر آپ کے والیٹ لیجر میں جمع ہو جاتے ہیں اور بلا کسی تاخیر کے دستیاب رہتے ہیں۔'
+                : 'All claimed daily plan returns are credited directly to your cryptographic ledger and remain available for withdrawal or plan compound.'}
             </p>
           </div>
         </div>

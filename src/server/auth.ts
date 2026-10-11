@@ -79,9 +79,19 @@ export function requireRoles(...allowedRoles: UserRole[]) {
     }
 
     if (!allowedRoles.includes(req.user.role)) {
+      dbStore.logAudit({
+        adminId: req.user.id,
+        adminEmail: req.user.email,
+        action: 'UNAUTHORIZED_PRIVILEGE_ATTEMPT',
+        targetType: 'API_Route',
+        targetId: req.path,
+        ipAddress: (req.headers['x-forwarded-for'] as string) || req.ip || '127.0.0.1',
+        metadata: { path: req.path, attemptedRole: req.user.role, requiredRoles: allowedRoles },
+      });
+
       return res.status(403).json({
         success: false,
-        error: `Forbidden: Access requires ${allowedRoles.join(' or ')} privileges.`,
+        error: `Access Denied: High-security administrative route. Only authenticated admins have access.`,
       });
     }
 

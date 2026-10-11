@@ -6,6 +6,12 @@ import { authenticate, requireRoles, generateToken, AuthenticatedRequest } from 
 import { getBlockchainProvider, SUPPORTED_NETWORKS } from './blockchain';
 import { storageProvider } from './storage';
 import {
+  authRateLimiter,
+  recordFailedLogin,
+  recordSuccessfulLogin,
+  registerRateLimiter,
+} from './security';
+import {
   CryptoAsset,
   BlockchainNetworkId,
   TransactionType,
@@ -41,7 +47,7 @@ apiRouter.get('/system/status', (req: Request, res: Response) => {
 // -----------------------------------------------------------------------------
 // 1. AUTHENTICATION & SESSIONS
 // -----------------------------------------------------------------------------
-apiRouter.post('/auth/register', (req: Request, res: Response) => {
+apiRouter.post('/auth/register', registerRateLimiter, (req: Request, res: Response) => {
   const { email, password, fullName, phoneNumber, username, referralCode } = req.body;
 
   if (!email || typeof email !== 'string' || !email.trim()) {
@@ -115,6 +121,49 @@ apiRouter.post('/auth/register', (req: Request, res: Response) => {
 
   dbStore.users.set(userId, newUser);
 
+  // Credit $1.00 USDT Welcome Bonus automatically to every new registered user
+  const bonusId = crypto.randomUUID();
+  dbStore.welcomeBonuses.set(userId, {
+    id: bonusId,
+    userId,
+    amount: 1.0,
+    asset: 'USDT',
+    status: 'CLAIMED',
+    claimedAt: new Date().toISOString(),
+    withdrawable: false,
+  });
+
+  dbStore.recordLedgerEntry({
+    userId,
+    type: 'BONUS',
+    asset: 'USDT',
+    amount: 1.0,
+    referenceId: bonusId,
+    description: 'Welcome Bonus Reward - $1.00 USDT credited upon registration',
+    idempotencyKey: `wb_${userId}`,
+  });
+
+  dbStore.transactions.push({
+    id: crypto.randomUUID(),
+    userId,
+    type: 'BONUS',
+    asset: 'USDT',
+    amount: 1.0,
+    fee: 0,
+    status: 'COMPLETED',
+    description: 'Welcome Bonus - $1.00 USDT credited to wallet',
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+  });
+
+  dbStore.sendNotification({
+    userId,
+    title: '🎁 $1.00 USDT Welcome Bonus Credited!',
+    message: 'Welcome to Profixa! $1.00 USDT has been credited to your available balance.',
+    type: 'REWARD',
+    link: '/dashboard/wallet',
+  });
+
   if (resolvedReferrerId) {
     dbStore.sendNotification({
       userId: resolvedReferrerId,
@@ -127,49 +176,6 @@ apiRouter.post('/auth/register', (req: Request, res: Response) => {
 
   dbStore.saveToDisk();
 
-  // Directly credit $1.00 Welcome Bonus to wallet ledger for every new user!
-  const bonusId = crypto.randomUUID();
-  dbStore.welcomeBonuses.set(userId, {
-    id: bonusId,
-    userId,
-    amount: 1.0,
-    asset: 'USDT',
-    status: 'CLAIMED',
-    claimedAt: new Date().toISOString(),
-  });
-
-  dbStore.recordLedgerEntry({
-    userId,
-    type: 'BONUS',
-    asset: 'USDT',
-    amount: 1.0,
-    referenceId: bonusId,
-    description: 'Welcome Bonus ($1.00 USDT) - Withdrawable upon activating any plan',
-    idempotencyKey: `welcome_bonus_${userId}`,
-  });
-
-  dbStore.transactions.push({
-    id: bonusId,
-    userId,
-    type: 'BONUS',
-    asset: 'USDT',
-    amount: 1.0,
-    fee: 0,
-    status: 'COMPLETED',
-    description: '$1.00 Welcome Bonus (Withdrawable upon activating any plan)',
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-  });
-
-  // Welcome notification
-  dbStore.sendNotification({
-    userId,
-    title: '🎁 $1.00 Welcome Bonus Credited!',
-    message: 'Welcome to Profixa! A $1.00 welcome bonus has been added to your wallet. Note: This bonus is withdrawable once you activate any earning plan.',
-    type: 'REWARD',
-    link: '/dashboard/wallet',
-  });
-
   const { passwordHash, ...safeUser } = newUser;
   const token = generateToken(safeUser as User);
 
@@ -181,7 +187,7 @@ apiRouter.post('/auth/register', (req: Request, res: Response) => {
   });
 });
 
-apiRouter.post('/auth/login', (req: Request, res: Response) => {
+apiRouter.post('/auth/login', authRateLimiter, (req: Request, res: Response) => {
   const { email, password } = req.body;
 
   if (!email || !password) {
@@ -218,6 +224,7 @@ apiRouter.post('/auth/login', (req: Request, res: Response) => {
   }
 
   if (!user) {
+    recordFailedLogin(req);
     return res.status(401).json({
       success: false,
       error: 'Account not found. Please enter your registered email or username, or create a new account.',
@@ -241,6 +248,7 @@ apiRouter.post('/auth/login', (req: Request, res: Response) => {
       verifyPassword(password, user.passwordHash));
 
   if (!isValidAdminPass && !verifyPassword(password, user.passwordHash)) {
+    recordFailedLogin(req);
     return res.status(401).json({
       success: false,
       error: 'Incorrect password. Please verify and try again.',
@@ -253,6 +261,8 @@ apiRouter.post('/auth/login', (req: Request, res: Response) => {
       error: 'Your account has been administratively suspended.',
     });
   }
+
+  recordSuccessfulLogin(req);
 
   const { passwordHash, ...safeUser } = user;
   const token = generateToken(safeUser as User);
@@ -481,13 +491,8 @@ apiRouter.post('/kyc/upload-document', authenticate, async (req: AuthenticatedRe
     return res.status(400).json({ success: false, error: validation.error });
   }
 
-  const { accessUrl } = await storageProvider.storeDocument({
-    userId: req.user!.id,
-    documentType,
-    fileName,
-    mimeType,
-    buffer: fileBase64,
-  });
+  const cleanBase64 = fileBase64.includes(';base64,') ? fileBase64.split(';base64,')[1] : fileBase64;
+  const dataUrl = fileBase64.startsWith('data:') ? fileBase64 : `data:${mimeType || 'image/jpeg'};base64,${cleanBase64}`;
 
   let kyc = dbStore.kycRecords.get(req.user!.id);
   if (!kyc) {
@@ -504,15 +509,16 @@ apiRouter.post('/kyc/upload-document', authenticate, async (req: AuthenticatedRe
     };
   }
 
-  if (documentType === 'ID_FRONT') kyc.documents.idFrontUrl = accessUrl;
-  if (documentType === 'ID_BACK') kyc.documents.idBackUrl = accessUrl;
-  if (documentType === 'SELFIE') kyc.documents.selfieUrl = accessUrl;
+  if (documentType === 'ID_FRONT') kyc.documents.idFrontUrl = dataUrl;
+  if (documentType === 'ID_BACK') kyc.documents.idBackUrl = dataUrl;
+  if (documentType === 'SELFIE') kyc.documents.selfieUrl = dataUrl;
   kyc.documents.uploadedAt = new Date().toISOString();
   kyc.updatedAt = new Date().toISOString();
 
   dbStore.kycRecords.set(req.user!.id, kyc);
+  dbStore.saveToDisk();
 
-  res.json({ success: true, accessUrl, documents: kyc.documents });
+  res.json({ success: true, accessUrl: dataUrl, documents: kyc.documents });
 });
 
 apiRouter.post('/kyc/submit', authenticate, (req: AuthenticatedRequest, res: Response) => {
@@ -928,9 +934,11 @@ apiRouter.post('/rewards/bonus/claim', authenticate, (req: AuthenticatedRequest,
 // 6. WALLET & TRANSACTIONS
 // -----------------------------------------------------------------------------
 apiRouter.get('/wallet/balances', authenticate, (req: AuthenticatedRequest, res: Response) => {
-  // Ensure every user has received their $1.00 Welcome Bonus in the ledger
-  const hasBonus = dbStore.ledger.some((l) => l.userId === req.user!.id && l.type === 'BONUS');
-  if (!hasBonus) {
+  // Ensure every user has received their $1.00 USDT Welcome Bonus
+  const hasWelcomeBonus = dbStore.ledger.some(
+    (l) => l.userId === req.user!.id && l.type === 'BONUS' && l.description.includes('Welcome Bonus')
+  );
+  if (!hasWelcomeBonus && req.user!.role === 'USER') {
     const bonusId = crypto.randomUUID();
     dbStore.welcomeBonuses.set(req.user!.id, {
       id: bonusId,
@@ -939,32 +947,18 @@ apiRouter.get('/wallet/balances', authenticate, (req: AuthenticatedRequest, res:
       asset: 'USDT',
       status: 'CLAIMED',
       claimedAt: new Date().toISOString(),
+      withdrawable: false,
     });
-    try {
-      dbStore.recordLedgerEntry({
-        userId: req.user!.id,
-        type: 'BONUS',
-        asset: 'USDT',
-        amount: 1.0,
-        referenceId: bonusId,
-        description: 'Welcome Bonus ($1.00 USDT) - Withdrawable upon activating any plan',
-        idempotencyKey: `welcome_bonus_${req.user!.id}`,
-      });
-      dbStore.transactions.push({
-        id: bonusId,
-        userId: req.user!.id,
-        type: 'BONUS',
-        asset: 'USDT',
-        amount: 1.0,
-        fee: 0,
-        status: 'COMPLETED',
-        description: '$1.00 Welcome Bonus (Withdrawable upon activating any plan)',
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-      });
-    } catch (e) {
-      console.warn('Bonus ledger entry error:', e);
-    }
+    dbStore.recordLedgerEntry({
+      userId: req.user!.id,
+      type: 'BONUS',
+      asset: 'USDT',
+      amount: 1.0,
+      referenceId: bonusId,
+      description: 'Welcome Bonus Reward - $1.00 USDT credited upon registration',
+      idempotencyKey: `wb_${req.user!.id}`,
+    });
+    dbStore.saveToDisk();
   }
 
   const balances = dbStore.calculateBalances(req.user!.id);
@@ -1015,6 +1009,13 @@ apiRouter.get('/referrals/summary', authenticate, (req: AuthenticatedRequest, re
     const planAmount = activePlan ? activePlan.amount : 0;
     const bonusEarned = Number((planAmount * 0.1).toFixed(2)); // 10% commission
 
+    // Calculate user's deposit status
+    const confirmedDeposits = dbStore.transactions.filter(
+      (t) => t.userId === ru.id && t.type === 'DEPOSIT' && t.status === 'CONFIRMED'
+    );
+    const totalDeposited = Number(confirmedDeposits.reduce((acc, d) => acc + d.amount, 0).toFixed(2));
+    const hasDeposited = totalDeposited > 0;
+
     const [local, domain] = ru.email.split('@');
     const maskedEmail = local.length > 2
       ? `${local[0]}***${local[local.length - 1]}@${domain}`
@@ -1027,11 +1028,14 @@ apiRouter.get('/referrals/summary', authenticate, (req: AuthenticatedRequest, re
       avatarUrl: ru.avatarUrl,
       joinedAt: ru.createdAt,
       hasActivePlan: !!activePlan,
-      activePlanName: activePlan?.planName || 'Free Member',
+      activePlanName: activePlan?.planName || (hasDeposited ? 'Funded Account' : 'Free Member'),
       planAmount: planAmount,
       kycStatus: ru.kycStatus,
       bonusEarned: bonusEarned,
-      status: (activePlan ? 'ACTIVE' : 'PENDING') as 'ACTIVE' | 'PENDING' | 'QUALIFIED',
+      hasDeposited,
+      totalDeposited,
+      depositStatus: hasDeposited ? `Deposited ($${totalDeposited.toFixed(2)})` : 'No Deposit',
+      status: (activePlan || hasDeposited ? 'ACTIVE' : 'PENDING') as 'ACTIVE' | 'PENDING' | 'QUALIFIED',
       tierLevel: 1,
     };
   });
@@ -1208,12 +1212,13 @@ apiRouter.post('/wallet/deposit-address', authenticate, async (req: Authenticate
 
 // User Submits Deposit (Pending Admin Approval)
 apiRouter.post('/wallet/submit-deposit', authenticate, (req: AuthenticatedRequest, res: Response) => {
-  const { asset, network, amount, txHash, senderAddress } = req.body as {
+  const { asset, network, amount, txHash, senderAddress, proofImage } = req.body as {
     asset: CryptoAsset;
     network: BlockchainNetworkId;
     amount: number;
     txHash?: string;
     senderAddress?: string;
+    proofImage?: string;
   };
 
   if (!asset || !network || !amount || amount <= 0) {
@@ -1244,7 +1249,7 @@ apiRouter.post('/wallet/submit-deposit', authenticate, (req: AuthenticatedReques
   const netConfig = SUPPORTED_NETWORKS[normalizedNet];
   const depositId = crypto.randomUUID();
 
-  // Create PENDING transaction. DO NOT credit ledger yet - Admin must approve!
+  // Create PENDING transaction with screenshot proof. DO NOT credit ledger yet - Admin must approve!
   const tx: Transaction = {
     id: depositId,
     userId: req.user!.id,
@@ -1258,11 +1263,13 @@ apiRouter.post('/wallet/submit-deposit', authenticate, (req: AuthenticatedReques
     fromAddress: senderAddress || 'User Wallet',
     toAddress: `Platform ${netConfig.name} Vault`,
     description: `Deposit ${amount} USDT via ${netConfig.name} (Waiting for Admin Confirmation)`,
+    proofImage: proofImage || undefined,
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
   };
 
   dbStore.transactions.unshift(tx);
+  dbStore.saveToDisk();
 
   dbStore.sendNotification({
     userId: req.user!.id,
@@ -1340,12 +1347,11 @@ apiRouter.post('/wallet/simulate-deposit', authenticate, (req: AuthenticatedRequ
 
 // Withdrawal Request (USDT across TRC20, Aptos, and BEP20, Pending Admin Approval)
 apiRouter.post('/wallet/withdraw', authenticate, async (req: AuthenticatedRequest, res: Response) => {
-  const { asset, network, destinationAddress, amount, password } = req.body as {
+  const { asset, network, destinationAddress, amount } = req.body as {
     asset: CryptoAsset;
     network: BlockchainNetworkId;
     destinationAddress: string;
     amount: number;
-    password?: string;
   };
 
   if (!asset || !destinationAddress || !amount) {
@@ -1383,22 +1389,6 @@ apiRouter.post('/wallet/withdraw', authenticate, async (req: AuthenticatedReques
       success: false,
       error: 'KYC Verification Required: You must complete identity verification before submitting withdrawals.',
     });
-  }
-
-  // Welcome Bonus Rule: Must activate at least one plan to unlock welcome bonus withdrawal
-  const userPlans = dbStore.userPlans.filter((p) => p.userId === req.user!.id);
-  const hasActiveOrCompletedPlan = userPlans.length > 0;
-  if (!hasActiveOrCompletedPlan) {
-    return res.status(400).json({
-      success: false,
-      error: 'Notice: The $1.00 Welcome Bonus can only be withdrawn after activating at least one earning plan. Please activate a plan from the Plans section first.',
-    });
-  }
-
-  // Verify password security check
-  const userRecord = dbStore.users.get(req.user!.id);
-  if (!password || !verifyPassword(password, userRecord!.passwordHash)) {
-    return res.status(401).json({ success: false, error: 'Invalid account authorization password.' });
   }
 
   if (!amount || amount <= 0) {
@@ -1485,6 +1475,7 @@ apiRouter.post('/wallet/withdraw', authenticate, async (req: AuthenticatedReques
   };
 
   dbStore.transactions.unshift(tx);
+  dbStore.saveToDisk();
 
   dbStore.sendNotification({
     userId: req.user!.id,
@@ -1677,7 +1668,28 @@ apiRouter.get('/admin/overview', authenticate, requireRoles('ADMIN', 'SUPER_ADMI
 });
 
 apiRouter.get('/admin/users', authenticate, requireRoles('ADMIN', 'SUPER_ADMIN', 'SUPPORT'), (req: AuthenticatedRequest, res: Response) => {
-  const users = Array.from(dbStore.users.values()).map(({ passwordHash, ...safe }) => safe);
+  const users = Array.from(dbStore.users.values()).map(({ passwordHash, ...safe }) => {
+    const balance = dbStore.calculateBalances(safe.id).USDT.available;
+    const confirmedDeposits = dbStore.transactions.filter(
+      (t) => t.userId === safe.id && t.type === 'DEPOSIT' && t.status === 'CONFIRMED'
+    );
+    const totalDeposited = Number(confirmedDeposits.reduce((sum, t) => sum + t.amount, 0).toFixed(2));
+    const hasDeposited = totalDeposited > 0;
+    
+    let referredByName: string | undefined = undefined;
+    if (safe.referredBy) {
+      const refUser = dbStore.users.get(safe.referredBy);
+      referredByName = refUser ? `${refUser.fullName} (${refUser.referralCode || refUser.username || 'Code'})` : safe.referredBy;
+    }
+
+    return {
+      ...safe,
+      balance,
+      totalDeposited,
+      hasDeposited,
+      referredByName,
+    };
+  });
   res.json({ success: true, users });
 });
 

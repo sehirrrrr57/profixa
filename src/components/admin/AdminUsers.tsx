@@ -5,13 +5,14 @@ import { Badge } from '../ui/Badge';
 import { Modal } from '../ui/Modal';
 import { useToast } from '../ui/Toast';
 import { CryptoAsset, User } from '../../types/index';
-import { Search, Ban, CheckCircle2, DollarSign, ShieldAlert, User as UserIcon } from 'lucide-react';
+import { Search, Ban, CheckCircle2, DollarSign, ShieldAlert, User as UserIcon, RefreshCw } from 'lucide-react';
 
 export const AdminUsers: React.FC = () => {
   const { showToast } = useToast();
   const [users, setUsers] = useState<User[]>([]);
   const [search, setSearch] = useState('');
   const [selectedUserForAdjustment, setSelectedUserForAdjustment] = useState<User | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
 
   // Adjustment form state
   const [adjAsset, setAdjAsset] = useState<CryptoAsset>('USDT');
@@ -20,11 +21,14 @@ export const AdminUsers: React.FC = () => {
   const [isSubmittingAdj, setIsSubmittingAdj] = useState(false);
 
   const loadUsers = async () => {
+    setIsLoading(true);
     try {
       const res = await api.getAdminUsers();
       if (res.success) setUsers(res.users);
     } catch (err) {
       console.warn('Failed to load users:', err);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -87,7 +91,7 @@ export const AdminUsers: React.FC = () => {
       </div>
 
       {/* Toolbar */}
-      <div className="bg-white p-4 rounded-2xl border border-[#EADBCE] shadow-xs flex items-center gap-3">
+      <div className="bg-white p-4 rounded-2xl border border-[#EADBCE] shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div className="relative flex-1 max-w-md">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#451A03]" />
           <input
@@ -98,6 +102,20 @@ export const AdminUsers: React.FC = () => {
             className="w-full h-10 pl-9 pr-3 text-xs bg-[#FDF8F5] border border-[#EADBCE] rounded-xl text-slate-900 outline-none focus:border-[#451A03]"
           />
         </div>
+
+        <div className="flex items-center gap-2">
+          <span className="text-xs text-slate-500 font-semibold">
+            Total Accounts: <span className="font-bold text-slate-900">{users.length}</span>
+          </span>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={loadUsers}
+            icon={<RefreshCw className={`w-3.5 h-3.5 ${isLoading ? 'animate-spin' : ''}`} />}
+          >
+            Refresh Accounts
+          </Button>
+        </div>
       </div>
 
       {/* User Table */}
@@ -107,9 +125,11 @@ export const AdminUsers: React.FC = () => {
             <thead>
               <tr className="bg-[#FAF7F5] border-b border-[#EADBCE] text-slate-600 font-semibold">
                 <th className="py-3 px-4">User</th>
+                <th className="py-3 px-4">Available Balance</th>
+                <th className="py-3 px-4">Total Deposited</th>
+                <th className="py-3 px-4">Referral Info</th>
                 <th className="py-3 px-4">Role</th>
                 <th className="py-3 px-4">KYC Status</th>
-                <th className="py-3 px-4">Email Confirmed</th>
                 <th className="py-3 px-4">Account Status</th>
                 <th className="py-3 px-4">Created</th>
                 <th className="py-3 px-4 text-right">Actions</th>
@@ -120,7 +140,33 @@ export const AdminUsers: React.FC = () => {
                 <tr key={u.id} className="hover:bg-[#FDF8F5] transition-colors">
                   <td className="py-3.5 px-4">
                     <p className="font-bold text-slate-900">{u.fullName}</p>
-                    <p className="text-[11px] text-slate-500">{u.email}</p>
+                    <p className="text-[11px] text-slate-500 font-mono">{u.email}</p>
+                  </td>
+                  <td className="py-3.5 px-4">
+                    <span className="font-black text-slate-900 text-xs">
+                      ${(u.balance !== undefined ? u.balance : 0).toFixed(2)} USDT
+                    </span>
+                  </td>
+                  <td className="py-3.5 px-4">
+                    {(u.totalDeposited && u.totalDeposited > 0) ? (
+                      <span className="font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-200">
+                        ${u.totalDeposited.toFixed(2)} USDT
+                      </span>
+                    ) : (
+                      <span className="text-slate-400 font-medium">No Deposits</span>
+                    )}
+                  </td>
+                  <td className="py-3.5 px-4">
+                    <div className="space-y-0.5">
+                      <div className="font-mono text-[11px] text-slate-800 font-semibold">
+                        Code: <span className="text-[#451A03] font-bold">{u.referralCode || '—'}</span>
+                      </div>
+                      {u.referredByName && (
+                        <div className="text-[10px] text-slate-500">
+                          Invited by: <span className="font-semibold text-slate-700">{u.referredByName}</span>
+                        </div>
+                      )}
+                    </div>
                   </td>
                   <td className="py-3.5 px-4">
                     <span className="font-bold text-[11px] px-2 py-0.5 rounded-md bg-[#FDF8F5] border border-[#EADBCE] text-[#451A03]">
@@ -140,15 +186,6 @@ export const AdminUsers: React.FC = () => {
                     >
                       {u.kycStatus}
                     </Badge>
-                  </td>
-                  <td className="py-3.5 px-4">
-                    {u.isEmailVerified ? (
-                      <span className="text-emerald-600 font-semibold flex items-center gap-1">
-                        <CheckCircle2 className="w-3.5 h-3.5" /> Yes
-                      </span>
-                    ) : (
-                      <span className="text-slate-400">No</span>
-                    )}
                   </td>
                   <td className="py-3.5 px-4">
                     {u.isSuspended ? (

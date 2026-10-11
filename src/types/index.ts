@@ -43,6 +43,10 @@ export interface User {
   avatarUrl?: string;
   referralCode?: string;
   referredBy?: string;
+  balance?: number;
+  totalDeposited?: number;
+  hasDeposited?: boolean;
+  referredByName?: string;
 }
 
 export interface ReferredUser {
@@ -58,6 +62,9 @@ export interface ReferredUser {
   bonusEarned: number;
   status: 'ACTIVE' | 'PENDING' | 'QUALIFIED';
   tierLevel: number;
+  hasDeposited?: boolean;
+  totalDeposited?: number;
+  depositStatus?: string;
 }
 
 export interface ReferralTier {
@@ -150,6 +157,7 @@ export interface Transaction {
   confirmations?: number;
   requiredConfirmations?: number;
   description: string;
+  proofImage?: string;
   createdAt: string;
   updatedAt: string;
 }
@@ -211,6 +219,7 @@ export interface WelcomeBonusClaim {
   asset: CryptoAsset;
   status: 'ELIGIBLE' | 'CLAIMED' | 'EXPIRED' | 'LOCKED';
   claimedAt?: string;
+  withdrawable?: boolean;
 }
 
 export interface NotificationItem {

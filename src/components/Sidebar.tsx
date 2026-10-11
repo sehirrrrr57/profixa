@@ -166,21 +166,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
           </button>
         </div>
 
-        {/* Welcome Bonus Notice Card inside Sidebar (For regular members) */}
-        {!isStaff && (
-          <div className="p-3 mx-3 mt-3 bg-[#FDF8F5] rounded-xl border border-[#EADBCE] shrink-0">
-            <div className="flex items-center gap-2">
-              <div className="w-7 h-7 rounded-lg bg-white border border-[#EADBCE] flex items-center justify-center shrink-0">
-                <Gift className="w-4 h-4 text-[#451A03]" />
-              </div>
-              <div>
-                <span className="text-xs font-bold text-[#451A03] block">$1.00 Welcome Bonus</span>
-                <span className="text-[10px] text-slate-500">Unlocks upon plan activation</span>
-              </div>
-            </div>
-          </div>
-        )}
-
         {/* Admin / Client Mode Switcher if user has staff privileges */}
         {isStaff && (
           <div className="p-3 mx-3 mt-2 bg-[#FDF8F5] rounded-xl border border-[#EADBCE] shrink-0">

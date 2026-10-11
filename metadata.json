@@ -1,6 +1,6 @@
 {
-  "name": "Cryptic.io Rewards",
-  "description": "Premium fintech crypto rewards platform supporting USDT and USDC with ledger-based accounting, KYC, configurable plans, wallet management, and dual English/Urdu support.",
+  "name": "Profixa Rewards",
+  "description": "Profixa provides high-yield decentralized crypto reward plans supporting Tether (USDT) across TRC20, Aptos, and BNB Smart Chain with ledger-based accounting, KYC, and admin desks.",
   "requestFramePermissions": [],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }

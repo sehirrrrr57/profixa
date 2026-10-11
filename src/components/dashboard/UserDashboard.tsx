@@ -81,46 +81,6 @@ export const UserDashboard: React.FC<UserDashboardProps> = ({ onNavigateView, on
 
   return (
     <div className="space-y-6 pb-12">
-      {/* ----------------------------------------------------------------- */}
-      {/* 1. WELCOME BONUS BANNER - Dark Brown Theme & Condition Notice      */}
-      {/* ----------------------------------------------------------------- */}
-      <div className="bg-white p-5 sm:p-6 rounded-2xl border border-[#EADBCE] shadow-2xs flex flex-col md:flex-row md:items-center justify-between gap-4 relative overflow-hidden">
-        <div className="absolute top-0 right-0 w-64 h-32 bg-[#FDF8F5] rounded-full blur-2xl pointer-events-none" />
-
-        <div className="flex items-start sm:items-center gap-3.5 relative">
-          <div className="w-12 h-12 rounded-xl bg-[#FDF8F5] border border-[#EADBCE] flex items-center justify-center shrink-0">
-            <Gift className="w-6 h-6 text-[#451A03] animate-pulse" />
-          </div>
-          <div>
-            <div className="flex flex-wrap items-center gap-2">
-              <span className="text-base font-extrabold text-slate-900">
-                🎁 $1.00 Welcome Bonus Active
-              </span>
-              <span className="text-[10px] font-extrabold uppercase px-2.5 py-0.5 rounded-full bg-[#451A03] text-white">
-                Credited in Wallet
-              </span>
-            </div>
-            <p className="text-xs sm:text-sm text-slate-600 mt-1">
-              <strong className="text-[#451A03]">Notice:</strong> Every new user receives a $1.00 welcome bonus in their balance. This bonus can only be withdrawn after activating at least one earning plan.
-            </p>
-            <p className="text-xs text-[#5C2B14] font-semibold mt-1" dir={isUrdu ? 'rtl' : 'ltr'}>
-              نوٹ: یہ $1 کا ویلکم بونس آپ کے والیٹ میں موجود ہے، مگر یہ صرف تب ودڈرا ہوگا جب آپ کوئی ایک پلان ایکٹیو کریں گے۔
-            </p>
-          </div>
-        </div>
-
-        <div className="shrink-0 flex items-center gap-2 relative">
-          <button
-            type="button"
-            onClick={() => navigate('plans')}
-            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-[#451A03] hover:bg-[#341402] active:bg-[#280F02] text-white text-xs font-bold transition-all shadow-md shadow-[#451A03]/20 cursor-pointer"
-          >
-            <Layers className="w-4 h-4" />
-            <span>{isUrdu ? 'پلان ایکٹیو کریں' : 'Activate a Plan →'}</span>
-          </button>
-        </div>
-      </div>
-
       {/* Header Welcome & KYC Reminder */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-5 sm:p-6 rounded-2xl border border-[#EADBCE] shadow-2xs">
         <div>
@@ -130,6 +90,12 @@ export const UserDashboard: React.FC<UserDashboardProps> = ({ onNavigateView, on
           <p className="text-xs sm:text-sm text-slate-500 mt-0.5">
             Welcome back, <span className="font-bold text-slate-800">{user?.fullName}</span>. Here is your portfolio overview.
           </p>
+          <div className="mt-2.5 flex items-center gap-2">
+            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-emerald-50 border border-emerald-200 text-emerald-800 text-[11px] font-bold">
+              <Gift className="w-3.5 h-3.5 text-emerald-600" />
+              <span>🎁 $1.00 USDT Welcome Bonus Active</span>
+            </span>
+          </div>
         </div>
 
         {user?.kycStatus !== 'APPROVED' && (
@@ -191,7 +157,7 @@ export const UserDashboard: React.FC<UserDashboardProps> = ({ onNavigateView, on
             <p className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">
               ${availableValuation}
             </p>
-            <p className="text-[11px] text-[#451A03] font-semibold mt-0.5">Includes $1.00 Welcome Bonus</p>
+            <p className="text-[11px] text-emerald-600 font-semibold mt-0.5">Verified Available Balance</p>
           </div>
           <div className="pt-2 border-t border-[#EADBCE] flex items-center gap-2">
             <button
@@ -338,7 +304,9 @@ export const UserDashboard: React.FC<UserDashboardProps> = ({ onNavigateView, on
               </div>
               <p className="text-sm font-bold text-slate-900">No Active Reward Plans Yet</p>
               <p className="text-xs text-slate-500 max-w-sm mx-auto">
-                Activate our $5 starter plan (or higher) to earn $11 total return over 7 days and unlock your $1.00 welcome bonus for withdrawal.
+                {isUrdu
+                  ? 'ارننگ اور یومیہ منافع کے لیے پلانز سیکشن سے اپنا پسندیدہ پلان ایکٹیو کریں۔'
+                  : 'Activate any earning plan from the Plans section to start receiving daily reward returns.'}
               </p>
               <button
                 type="button"
@@ -388,7 +356,7 @@ export const UserDashboard: React.FC<UserDashboardProps> = ({ onNavigateView, on
                   <Layers className="w-4 h-4 text-[#451A03]" />
                 </div>
                 <p className="text-xs font-bold text-slate-900">Activate Plan</p>
-                <p className="text-[10px] text-slate-500">$5 yields $11</p>
+                <p className="text-[10px] text-slate-500">{isUrdu ? 'منافع بخش پلانز' : 'Investment Plans'}</p>
               </button>
               <button
                 type="button"

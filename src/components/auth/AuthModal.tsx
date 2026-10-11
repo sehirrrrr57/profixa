@@ -118,8 +118,8 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, initialMo
           'success',
           language === 'ur' ? 'اکاؤنٹ بن گیا' : 'Account Created Successfully',
           language === 'ur'
-            ? 'پروفیکسا میں خوش آمدید! $1 بونس شامل کر دیا گیا ہے۔'
-            : 'Welcome to Profixa! $1.00 Welcome Bonus has been credited to your wallet.'
+            ? 'پروفیکسا میں خوش آمدید! آپ کا اکاؤنٹ کامیابی سے بن چکا ہے۔'
+            : 'Welcome to Profixa! Your account has been created successfully.'
         );
         onClose();
       } else {
@@ -182,7 +182,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, initialMo
         mode === 'login'
           ? (language === 'ur' ? 'اپنے اکاؤنٹ میں داخل ہونے کے لیے معلومات درج کریں۔' : 'Access your decentralized crypto reward portfolio.')
           : mode === 'signup'
-          ? (language === 'ur' ? 'چند سیکنڈ میں اکاؤنٹ بنائیں اور $1 کا بونس حاصل کریں۔' : 'Register your verified account and receive a $1.00 Welcome Bonus.')
+          ? (language === 'ur' ? 'چند سیکنڈ میں اپنا مفت اور محفوظ اکاؤنٹ بنائیں۔' : 'Register your verified personal account to start.')
           : (language === 'ur' ? 'اپنا ای میل درج کریں تاکہ ری سیٹ لنک بھیجا جا سکے۔' : 'Enter your registered email to receive recovery instructions.')
       }
     >
@@ -219,19 +219,6 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, initialMo
           {language === 'ur' ? 'نیا اکاؤنٹ' : 'Create Account'}
         </button>
       </div>
-
-      {/* Welcome Bonus Notice in Signup Mode */}
-      {mode === 'signup' && (
-        <div className="p-3.5 mb-4 rounded-xl bg-[#FDF8F5] border border-[#EADBCE] flex items-start gap-2.5 text-xs text-[#451A03]">
-          <Gift className="w-5 h-5 text-[#451A03] shrink-0 mt-0.5" />
-          <div>
-            <span className="font-bold block text-slate-900">🎁 $1.00 Welcome Bonus on Signup</span>
-            <span className="text-slate-600 block mt-0.5">
-              Credited to your balance immediately upon registration. Notice: Withdrawable upon activating any earning plan.
-            </span>
-          </div>
-        </div>
-      )}
 
       {/* Error Message with Quick Switch */}
       {error && (
@@ -287,7 +274,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, initialMo
                 required
                 value={fullName}
                 onChange={(e) => setFullName(e.target.value)}
-                placeholder="Enter your full name"
+                placeholder=""
                 className="w-full h-11 pl-10 pr-4 text-xs bg-white border border-[#EADBCE] rounded-xl focus:border-[#451A03] text-slate-900 outline-none transition-colors"
               />
             </div>
@@ -307,7 +294,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, initialMo
               required
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              placeholder={mode === 'login' ? (language === 'ur' ? 'ای میل یا یوزر نیم درج کریں' : 'Enter email or username') : 'user@example.com'}
+              placeholder=""
               className="w-full h-11 pl-10 pr-4 text-xs bg-white border border-[#EADBCE] rounded-xl focus:border-[#451A03] text-slate-900 outline-none transition-colors"
               autoComplete="username"
               autoCapitalize="none"
@@ -326,7 +313,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, initialMo
                 type="tel"
                 value={phoneNumber}
                 onChange={(e) => setPhoneNumber(e.target.value)}
-                placeholder="+92 300 1234567"
+                placeholder=""
                 className="w-full h-11 pl-10 pr-4 text-xs bg-white border border-[#EADBCE] rounded-xl focus:border-[#451A03] text-slate-900 outline-none transition-colors"
               />
             </div>
@@ -351,7 +338,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, initialMo
                 type="text"
                 value={referralCode}
                 onChange={(e) => setReferralCode(e.target.value.toUpperCase())}
-                placeholder="e.g. ADEEBA85"
+                placeholder=""
                 className="w-full h-11 pl-10 pr-4 text-xs bg-white border border-[#EADBCE] rounded-xl focus:border-[#451A03] text-slate-900 font-mono uppercase tracking-wider outline-none transition-colors"
               />
             </div>

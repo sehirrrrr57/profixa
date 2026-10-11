@@ -80,14 +80,6 @@ export const TopHeader: React.FC<TopHeaderProps> = ({
 
       {/* Right Controls with Dark Brown Accents */}
       <div className="flex items-center gap-2 sm:gap-3">
-        {/* Welcome Bonus Quick Pill (For regular users) */}
-        {user?.role === 'USER' && (
-          <div className="hidden lg:flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#FDF8F5] border border-[#EADBCE] text-xs font-bold text-[#451A03]">
-            <Gift className="w-4 h-4 text-[#451A03]" />
-            <span>$1.00 Bonus Active</span>
-          </div>
-        )}
-
         {/* Dual Language Switcher */}
         <button
           type="button"

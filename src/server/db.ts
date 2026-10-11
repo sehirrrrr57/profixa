@@ -214,9 +214,10 @@ class DatabaseStore {
   public welcomeBonuses: Map<string, WelcomeBonusClaim> = new Map();
   public idempotencyKeys: Set<string> = new Set();
 
-  private dataDir = path.join(process.cwd(), '.data');
+  private baseDir = path.basename(process.cwd()) === 'dist' ? path.join(process.cwd(), '..') : process.cwd();
+  private dataDir = path.join(this.baseDir, '.data');
   private dataFilePath = path.join(this.dataDir, 'profixa_db.json');
-  private fallbackFilePath = path.join(process.cwd(), 'src', 'server', 'persisted_db.json');
+  private fallbackFilePath = path.join(this.baseDir, 'src', 'server', 'persisted_db.json');
 
   public systemSettings: SystemSettings = {
     maintenanceMode: false,
@@ -243,9 +244,18 @@ class DatabaseStore {
     },
   };
 
+  private isSeeding: boolean = false;
+
   constructor() {
-    this.seedInitialData();
-    this.loadFromDisk();
+    const loaded = this.loadFromDisk();
+    if (!loaded || this.users.size === 0) {
+      console.log('[DatabaseStore] No prior database found on disk. Initializing initial baseline seeds...');
+      this.seedInitialData();
+      this.saveToDisk();
+    } else {
+      console.log(`[DatabaseStore] Successfully restored ${this.users.size} accounts and ${this.transactions.length} transactions from persistent database.`);
+    }
+    this.ensureStandardRewardPlans();
     this.ensureAdminCredentials();
   }
 
@@ -296,8 +306,12 @@ class DatabaseStore {
       const raw = fs.readFileSync(filePath, 'utf-8');
       const data = JSON.parse(raw);
       if (Array.isArray(data.users)) {
-        for (const [key, user] of data.users) {
-          this.users.set(key, user);
+        for (const item of data.users) {
+          if (Array.isArray(item) && item.length === 2) {
+            this.users.set(item[0], item[1]);
+          } else if (item && typeof item === 'object' && item.id) {
+            this.users.set(item.id, item);
+          }
         }
       }
       if (Array.isArray(data.ledger) && data.ledger.length > 0) {
@@ -352,14 +366,63 @@ class DatabaseStore {
         ethereum: '0x2Edb4F3f21ab754d78EC66dF0e1DCf7E4B8bCC85',
         aptos: this.systemSettings.depositAddresses?.aptos || '0x8fa9c44b36021fdb934ce3c8524a1b02de29ea75f458e0a1334c26788db3d4ee',
       };
+
+      // Ensure primary creator Adeeba Ansari is always active as SUPER_ADMIN
+      const adeebaId = 'u4000000-0000-0000-0000-000000000004';
+      const existingAdeeba = Array.from(this.users.values()).find(
+        (u) => u.email === 'adeebaansari085@gmail.com' || u.username === 'adeebaansari085'
+      );
+      if (existingAdeeba) {
+        existingAdeeba.role = 'SUPER_ADMIN';
+        this.users.set(existingAdeeba.id, existingAdeeba);
+      } else {
+        this.users.set(adeebaId, {
+          id: adeebaId,
+          email: 'adeebaansari085@gmail.com',
+          username: 'adeebaansari085',
+          passwordHash: hashPassword('Password123!'),
+          fullName: 'Adeeba Ansari',
+          phoneNumber: '+92 300 1234567',
+          country: 'Pakistan',
+          address: 'Islamabad, Pakistan',
+          dateOfBirth: '1998-05-15',
+          idNumber: '61101-9876543-2',
+          role: 'SUPER_ADMIN',
+          isEmailVerified: true,
+          kycStatus: 'APPROVED',
+          twoFactorEnabled: false,
+          isSuspended: false,
+          createdAt: '2026-01-01T00:00:00.000Z',
+          updatedAt: new Date().toISOString(),
+          referralCode: 'ADEEBAANSARI085',
+        });
+      }
       return true;
     };
 
     try {
-      if (parseAndLoad(this.dataFilePath)) loadedAny = true;
-      if (parseAndLoad(this.fallbackFilePath)) loadedAny = true;
+      let fileToLoad = this.dataFilePath;
+      const dataExists = fs.existsSync(this.dataFilePath);
+      const fallbackExists = fs.existsSync(this.fallbackFilePath);
+
+      if (dataExists && fallbackExists) {
+        const m1 = fs.statSync(this.dataFilePath).mtimeMs;
+        const m2 = fs.statSync(this.fallbackFilePath).mtimeMs;
+        fileToLoad = m2 > m1 ? this.fallbackFilePath : this.dataFilePath;
+      } else if (!dataExists && fallbackExists) {
+        fileToLoad = this.fallbackFilePath;
+      }
+
+      if (fs.existsSync(fileToLoad) && parseAndLoad(fileToLoad)) {
+        loadedAny = true;
+      } else if (fileToLoad === this.fallbackFilePath && dataExists && parseAndLoad(this.dataFilePath)) {
+        loadedAny = true;
+      } else if (fileToLoad === this.dataFilePath && fallbackExists && parseAndLoad(this.fallbackFilePath)) {
+        loadedAny = true;
+      }
+
       if (loadedAny) {
-        console.log(`[DatabaseStore] Loaded ${this.users.size} accounts from persistent disk storage.`);
+        console.log(`[DatabaseStore] Loaded ${this.users.size} accounts and ${this.transactions.length} transactions from persistent storage.`);
       }
       return loadedAny;
     } catch (err) {
@@ -400,6 +463,53 @@ class DatabaseStore {
       admin.role = 'SUPER_ADMIN';
       admin.username = 'admin';
       admin.passwordHash = hashPassword('AdminPassword2026!');
+    }
+  }
+
+  public ensureStandardRewardPlans() {
+    let updated = false;
+    const planConfigs = [
+      { amount: 5, cycleDays: 7, totalReturn: 11.0, dailyReturn: 1.5714, rate: 120.0, name: '$5 Starter Reward Plan' },
+      { amount: 10, cycleDays: 7, totalReturn: 22.0, dailyReturn: 3.1428, rate: 120.0, name: '$10 Basic Reward Plan' },
+      { amount: 20, cycleDays: 14, totalReturn: 48.0, dailyReturn: 3.4285, rate: 140.0, name: '$20 Standard Reward Plan' },
+      { amount: 45, cycleDays: 14, totalReturn: 112.5, dailyReturn: 8.0357, rate: 150.0, name: '$45 Growth Reward Plan' },
+      { amount: 75, cycleDays: 21, totalReturn: 202.5, dailyReturn: 9.6428, rate: 170.0, name: '$75 Advanced Reward Plan' },
+      { amount: 100, cycleDays: 30, totalReturn: 300.0, dailyReturn: 10.0, rate: 200.0, name: '$100 Premier Reward Plan' },
+      { amount: 200, cycleDays: 30, totalReturn: 640.0, dailyReturn: 21.3333, rate: 220.0, name: '$200 Executive Reward Plan' },
+      { amount: 300, cycleDays: 30, totalReturn: 990.0, dailyReturn: 33.0, rate: 230.0, name: '$300 Elite Reward Plan' },
+      { amount: 500, cycleDays: 30, totalReturn: 1750.0, dailyReturn: 58.3333, rate: 250.0, name: '$500 Institutional Reward Plan' },
+    ];
+
+    for (const cfg of planConfigs) {
+      if (!this.rewardPlans.some((p) => p.amount === cfg.amount)) {
+        this.rewardPlans.push({
+          id: crypto.randomUUID(),
+          name: cfg.name,
+          amount: cfg.amount,
+          asset: 'USDT',
+          cycleDays: cfg.cycleDays,
+          projectedRewardRatePercent: cfg.rate,
+          totalReturn: cfg.totalReturn,
+          dailyReturn: cfg.dailyReturn,
+          scheduleDescription: `${cfg.cycleDays}-day cycle with daily claim return of $${cfg.dailyReturn.toFixed(2)}/day (Total: $${cfg.totalReturn.toFixed(2)})`,
+          minBalanceRequired: cfg.amount,
+          status: 'ACTIVE',
+          maxActivePerUser: 5,
+          riskNotice: 'Platform rewards are generated from crypto market trading. We follow institutional capital preservation and risk management.',
+          termsSummary: `Earn $${cfg.dailyReturn.toFixed(2)} daily over ${cfg.cycleDays} days totaling $${cfg.totalReturn.toFixed(2)} guaranteed returns.`,
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+        });
+        updated = true;
+      }
+    }
+
+    if (updated) {
+      this.rewardPlans.sort((a, b) => a.amount - b.amount);
+      if (!this.isSeeding) {
+        this.saveToDisk();
+      }
+      console.log(`[DatabaseStore] Ensured standard reward plans (total ${this.rewardPlans.length} plans available).`);
     }
   }
 
@@ -489,7 +599,9 @@ class DatabaseStore {
     };
 
     this.ledger.push(entry);
-    this.saveToDisk();
+    if (!this.isSeeding) {
+      this.saveToDisk();
+    }
     return entry;
   }
 
@@ -521,7 +633,9 @@ class DatabaseStore {
       createdAt: new Date().toISOString(),
     };
     this.auditLogs.unshift(log);
-    this.saveToDisk();
+    if (!this.isSeeding) {
+      this.saveToDisk();
+    }
     return log;
   }
 
@@ -546,7 +660,9 @@ class DatabaseStore {
       link: params.link,
     };
     this.notifications.unshift(item);
-    this.saveToDisk();
+    if (!this.isSeeding) {
+      this.saveToDisk();
+    }
     return item;
   }
 
@@ -554,6 +670,15 @@ class DatabaseStore {
   // SEED INITIAL DATA
   // ---------------------------------------------------------------------------
   private seedInitialData() {
+    this.isSeeding = true;
+    try {
+      this.seedCoreData();
+    } finally {
+      this.isSeeding = false;
+    }
+  }
+
+  private seedCoreData() {
     // 1. Admin User
     const adminId = 'a1000000-0000-0000-0000-000000000001';
     const adminUser: User & { passwordHash: string } = {
@@ -693,6 +818,8 @@ class DatabaseStore {
       { amount: 45, cycleDays: 14, totalReturn: 112.5, dailyReturn: 8.0357, rate: 150.0, name: '$45 Growth Reward Plan' },
       { amount: 75, cycleDays: 21, totalReturn: 202.5, dailyReturn: 9.6428, rate: 170.0, name: '$75 Advanced Reward Plan' },
       { amount: 100, cycleDays: 30, totalReturn: 300.0, dailyReturn: 10.0, rate: 200.0, name: '$100 Premier Reward Plan' },
+      { amount: 200, cycleDays: 30, totalReturn: 640.0, dailyReturn: 21.3333, rate: 220.0, name: '$200 Executive Reward Plan' },
+      { amount: 300, cycleDays: 30, totalReturn: 990.0, dailyReturn: 33.0, rate: 230.0, name: '$300 Elite Reward Plan' },
       { amount: 500, cycleDays: 30, totalReturn: 1750.0, dailyReturn: 58.3333, rate: 250.0, name: '$500 Institutional Reward Plan' },
     ];
 
@@ -773,37 +900,6 @@ class DatabaseStore {
       description: 'Deposit 50.00 USDT via Aptos',
       createdAt: '2026-01-18T14:30:00.000Z',
       updatedAt: '2026-01-18T14:32:00.000Z',
-    });
-
-    // Welcome Bonus for Demo User ($1.00 USDT)
-    const bonusId = crypto.randomUUID();
-    this.recordLedgerEntry({
-      userId: demoUserId,
-      type: 'BONUS',
-      asset: 'USDT',
-      amount: 1.0,
-      referenceId: bonusId,
-      description: 'Verified Member Welcome Bonus ($1.00 USDT)',
-    });
-    this.transactions.push({
-      id: bonusId,
-      userId: demoUserId,
-      type: 'BONUS',
-      asset: 'USDT',
-      amount: 1.0,
-      fee: 0,
-      status: 'CONFIRMED',
-      description: 'Welcome Bonus credited upon KYC verification',
-      createdAt: '2026-01-18T15:00:00.000Z',
-      updatedAt: '2026-01-18T15:00:00.000Z',
-    });
-    this.welcomeBonuses.set(demoUserId, {
-      id: bonusId,
-      userId: demoUserId,
-      amount: 1.0,
-      asset: 'USDT',
-      status: 'CLAIMED',
-      claimedAt: '2026-01-18T15:00:00.000Z',
     });
 
     // Active User Plan ($45 Growth Reward Plan)

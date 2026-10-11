@@ -2,14 +2,28 @@ import express from 'express';
 import path from 'path';
 import { createServer as createViteServer } from 'vite';
 import { apiRouter } from './src/server/routes';
+import {
+  securityHeadersMiddleware,
+  generalApiLimiter,
+  inputSanitizerMiddleware,
+} from './src/server/security';
 
 async function startServer() {
   const app = express();
   const PORT = 3000;
 
-  // Global parsing middleware
+  // 1. Security Headers (Anti-XSS, Anti-Clickjacking, Strict MIME)
+  app.use(securityHeadersMiddleware);
+
+  // 2. Global parsing middleware with safe limits
   app.use(express.json({ limit: '10mb' }));
   app.use(express.urlencoded({ extended: true, limit: '10mb' }));
+
+  // 3. Advanced input payload sanitizer (Blocks XSS, injection scripts, prototype pollution)
+  app.use(inputSanitizerMiddleware);
+
+  // 4. Rate Limiter for API endpoints
+  app.use('/api', generalApiLimiter);
 
   // Request logger for API calls
   app.use((req, res, next) => {

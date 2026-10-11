@@ -2,7 +2,7 @@
 
 const getAuthToken = (): string | null => {
   try {
-    return localStorage.getItem('cryptic_token');
+    return localStorage.getItem('profixa_token') || localStorage.getItem('cryptic_token');
   } catch {
     return null;
   }

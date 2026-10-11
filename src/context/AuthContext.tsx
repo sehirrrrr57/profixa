@@ -15,7 +15,6 @@ interface AuthContextType {
   register: (data: { email: string; password: string; fullName: string; phoneNumber?: string; referralCode?: string }) => Promise<void>;
   resetPassword: (email: string, newPassword: string) => Promise<void>;
   logout: () => void;
-  quickLogin: (type: 'user' | 'admin' | 'newuser') => Promise<void>;
   refreshUser: () => Promise<void>;
   refreshBalances: () => Promise<void>;
   refreshNotifications: () => Promise<void>;
@@ -29,7 +28,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [user, setUser] = useState<User | null>(null);
   const [token, setToken] = useState<string | null>(() => {
     try {
-      return localStorage.getItem('cryptic_token');
+      return localStorage.getItem('profixa_token') || localStorage.getItem('cryptic_token');
     } catch {
       return null;
     }
@@ -43,8 +42,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setToken(newToken);
     try {
       if (newToken) {
+        localStorage.setItem('profixa_token', newToken);
         localStorage.setItem('cryptic_token', newToken);
       } else {
+        localStorage.removeItem('profixa_token');
         localStorage.removeItem('cryptic_token');
       }
     } catch {
@@ -173,16 +174,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setKycRecord(null);
   };
 
-  const quickLogin = async (type: 'user' | 'admin' | 'newuser') => {
-    if (type === 'admin') {
-      await login('admin@cryptic.io', 'AdminPass123!');
-    } else if (type === 'user') {
-      await login('demo@cryptic.io', 'DemoPass123!');
-    } else {
-      await login('newuser@cryptic.io', 'UserPass123!');
-    }
-  };
-
   const markNotificationAsRead = async (id: string) => {
     try {
       await api.markNotificationRead(id);
@@ -218,7 +209,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         register,
         resetPassword,
         logout,
-        quickLogin,
         refreshUser,
         refreshBalances,
         refreshNotifications,

@@ -166,11 +166,6 @@ export const PlansView: React.FC = () => {
                 ? 'ہم آپ کے جمع کردہ فنڈز سے پروفیشنل کرپٹو ٹریڈنگ کرتے ہیں جس کا منافع ڈیلی کلیم کے طور پر واپس دیا جاتا ہے۔ $5 پلان پر ویک اینڈ / 7 دنوں کے اختتام پر مکمل $11.00 ریٹرن ملتا ہے۔ جس دن پلان ایکٹیو کریں گے اسی دن سے ڈے 1 شروع ہوگا۔'
                 : 'All deposited funds are traded across high-liquidity crypto markets. For example, our $5 plan yields a total of $11.00 at the end of the 7-day cycle ($1.57/day claimable). Day 1 starts immediately on activation.'}
             </p>
-            <p className="text-[#5C2B14] font-semibold text-[11px]" dir={isUrdu ? 'rtl' : 'ltr'}>
-              {isUrdu
-                ? '🎁 نوٹ: کسی بھی پلان کو ایکٹیو کرنے سے آپ کا $1 ویلکم بونس بھی فورا ودڈرا کے لیے ان لاک ہو جائے گا۔'
-                : '🎁 Note: Activating any plan also immediately unlocks withdrawal eligibility for your $1.00 Welcome Bonus.'}
-            </p>
           </div>
         </div>
 
@@ -474,12 +469,6 @@ export const PlansView: React.FC = () => {
               <p className="text-[11px] text-amber-900 font-semibold pt-0.5" dir="rtl">
                 آپ کے پیسوں سے ہم کرپٹو ٹریڈنگ کریں گے اور منافع روزانہ کلیم کے ذریعے دیں گے۔ رسک مینجمنٹ فالو کی جاتی ہے۔
               </p>
-            </div>
-
-            {/* Welcome Bonus Unlock Notice */}
-            <div className="p-3 bg-[#FDF8F5] border border-[#EADBCE] rounded-xl text-xs text-[#451A03] flex items-center gap-2">
-              <Gift className="w-5 h-5 text-[#451A03] shrink-0" />
-              <span>Activating this plan immediately unlocks your $1.00 Welcome Bonus for withdrawal!</span>
             </div>
 
             {/* Insufficient funds warning */}

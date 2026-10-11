@@ -90,10 +90,10 @@ export const LandingPage: React.FC<LandingPageProps> = ({
         : 'User pooled funds are deployed into professional cryptocurrency spot trading, cross-exchange arbitrage, and market making. Profits are returned directly to your ledger while applying strict risk management.',
     },
     {
-      q: isUrdu ? 'کیا ہر نئے یوزر کو $1 کا ویلکم بونس ملتا ہے؟' : 'Does every new user receive a $1.00 Welcome Bonus?',
+      q: isUrdu ? 'ڈپازٹ اور ودڈراول کتنی دیر میں کنفرم ہوتے ہیں؟' : 'How quickly are deposits and withdrawals processed?',
       a: isUrdu
-        ? 'جی ہاں! اکاؤنٹ بناتے ہی $1 کا بونس فوراً آپ کے اکاؤنٹ میں کریڈٹ ہو جاتا ہے۔ یہ بونس آپ کا کوئی بھی ایک پلان ایکٹیو ہونے کے بعد ودڈرا ہو سکے گا۔'
-        : 'Yes! Every new user instantly receives a $1.00 USDT welcome bonus upon registration. It unlocks for withdrawal as soon as you activate any earning plan.',
+        ? 'تمام ڈپازٹس اور ودڈراولز ایڈمن تصدیق کے بعد فوری طور پر آپ کے اکاؤنٹ یا کرپٹو والٹ میں ٹرانسفر ہو جاتے ہیں۔'
+        : 'Deposits and withdrawals are reviewed and confirmed by our finance desk promptly upon blockchain submission.',
     },
     {
       q: isUrdu ? 'کیا ڈیلی کلیم اسی دن شروع ہوتا ہے؟' : 'Does daily claim start on the very first day?',
@@ -116,16 +116,16 @@ export const LandingPage: React.FC<LandingPageProps> = ({
         </div>
 
         <div className="relative max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          {/* Welcome Bonus Notice Pill */}
+          {/* Platform Protocol Pill */}
           <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#FDF8F5] border border-[#EADBCE] shadow-2xs mb-6 text-xs font-bold text-[#451A03]">
-            <Gift className="w-4 h-4 text-[#451A03] animate-bounce" />
+            <Sparkles className="w-4 h-4 text-[#451A03]" />
             <span>
               {isUrdu
-                ? '🎁 تمام نئے صارفین کے لیے $1.00 مفت ویلکم بونس!'
-                : '🎁 $1.00 Free Welcome Bonus for Every New User!'}
+                ? '⚡ محفوظ کرپٹو انویسٹمنٹ اور یومیہ ریوارڈ پلیٹ فارم'
+                : '⚡ Secure Cryptocurrency Reward & Yield Protocol'}
             </span>
             <span className="text-[10px] font-extrabold uppercase tracking-wider bg-[#451A03] text-white px-2 py-0.5 rounded-full">
-              Instant
+              Live
             </span>
           </div>
 

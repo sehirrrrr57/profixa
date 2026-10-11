@@ -135,7 +135,7 @@ export const ReferralView: React.FC<ReferralViewProps> = ({ onNavigate }) => {
   const handleShareNative = async () => {
     const shareData = {
       title: 'Join Profixa - Smart Crypto Rewards',
-      text: `Join Profixa and earn daily crypto returns on USDT! Get a $1.00 welcome bonus on registration using my code: ${referralCode}`,
+      text: `Join Profixa and earn daily crypto returns on USDT! Register using my invitation code: ${referralCode}`,
       url: referralLink,
     };
 
@@ -152,14 +152,14 @@ export const ReferralView: React.FC<ReferralViewProps> = ({ onNavigate }) => {
 
   const handleShareWhatsApp = () => {
     const text = encodeURIComponent(
-      `Join Profixa and earn daily crypto returns on USDT! Get a $1.00 welcome bonus on registration using my link:\n${referralLink}\nReferral Code: ${referralCode}`
+      `Join Profixa and earn daily crypto returns on USDT! Register using my invitation link:\n${referralLink}\nReferral Code: ${referralCode}`
     );
     window.open(`https://api.whatsapp.com/send?text=${text}`, '_blank');
   };
 
   const handleShareTelegram = () => {
     const text = encodeURIComponent(
-      `Join Profixa and earn daily crypto returns on USDT! Get a $1.00 welcome bonus using code: ${referralCode}`
+      `Join Profixa and earn daily crypto returns on USDT! Register using my code: ${referralCode}`
     );
     window.open(`https://t.me/share/url?url=${encodeURIComponent(referralLink)}&text=${text}`, '_blank');
   };
@@ -277,7 +277,9 @@ export const ReferralView: React.FC<ReferralViewProps> = ({ onNavigate }) => {
                 {isUrdu ? 'اپنا منفرد دعوتی لنک دوستوں کو بھیجیں' : 'Your Unique Partner Invitation Link'}
               </h2>
               <p className="text-xs sm:text-sm text-slate-600 mt-1 max-w-xl">
-                Every user who registers with your link earns an instant $1.00 welcome bonus, and you receive lifetime commission on every earning plan they activate.
+                {isUrdu
+                  ? 'جب بھی کوئی صارف آپ کے لنک سے شامل ہو کر کوئی ارننگ پلان ایکٹیو کرے گا، آپ کو فوری لائف ٹائم کمیشن بونس ملے گا۔'
+                  : 'Invite friends and partners with your personal link to earn instant lifetime USDT commission on every earning plan they activate.'}
               </p>
             </div>
 
@@ -634,6 +636,7 @@ export const ReferralView: React.FC<ReferralViewProps> = ({ onNavigate }) => {
               <thead>
                 <tr className="border-b border-[#EADBCE] text-slate-400 font-semibold">
                   <th className="pb-3 px-3">{t.referrals.member}</th>
+                  <th className="pb-3 px-3">Deposit Status</th>
                   <th className="pb-3 px-3">{t.referrals.planStatus}</th>
                   <th className="pb-3 px-3">Plan Amount</th>
                   <th className="pb-3 px-3">{t.referrals.kyc}</th>
@@ -655,6 +658,21 @@ export const ReferralView: React.FC<ReferralViewProps> = ({ onNavigate }) => {
                           <p className="text-[11px] text-slate-500 font-mono">{member.email}</p>
                         </div>
                       </div>
+                    </td>
+
+                    {/* Deposit Status */}
+                    <td className="py-3 px-3">
+                      {member.hasDeposited ? (
+                        <span className="inline-flex items-center gap-1 font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-200 text-[11px]">
+                          <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                          <span>Deposited (${(member.totalDeposited || 0).toFixed(2)})</span>
+                        </span>
+                      ) : (
+                        <span className="inline-flex items-center gap-1 text-slate-500 bg-slate-100 px-2 py-0.5 rounded-md text-[11px]">
+                          <Clock className="w-3 h-3 text-slate-400 shrink-0" />
+                          <span>No Deposit</span>
+                        </span>
+                      )}
                     </td>
 
                     {/* Plan Status */}

@@ -20,6 +20,7 @@ import {
   Share2,
   AlertCircle,
   Download,
+  Upload,
 } from 'lucide-react';
 
 interface NetworkOption {
@@ -281,16 +282,36 @@ export const WalletView: React.FC = () => {
   const [isLoadingDeposit, setIsLoadingDeposit] = useState(false);
   const [hasCopiedAddress, setHasCopiedAddress] = useState(false);
 
-  // Manual Tx Hash submission state
+  // Manual Tx Hash & Payment Proof Screenshot submission state
   const [manualTxHash, setManualTxHash] = useState('');
   const [manualAmount, setManualAmount] = useState<string>('50');
+  const [proofImage, setProofImage] = useState<string | null>(null);
+  const [proofFileName, setProofFileName] = useState<string>('');
   const [isSubmittingDeposit, setIsSubmittingDeposit] = useState(false);
+
+  const handleProofChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (!file.type.startsWith('image/')) {
+      showToast('error', 'Invalid File Type', 'Please upload an image screenshot (PNG, JPG, JPEG, WEBP).');
+      return;
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      showToast('error', 'File Too Large', 'Maximum allowed screenshot size is 5MB.');
+      return;
+    }
+    setProofFileName(file.name);
+    const reader = new FileReader();
+    reader.onload = () => {
+      setProofImage(reader.result as string);
+    };
+    reader.readAsDataURL(file);
+  };
 
   // Withdrawal state (Exclusively Aptos USDT)
   const [withdrawNetwork, setWithdrawNetwork] = useState<BlockchainNetworkId>('aptos');
   const [withdrawAddress, setWithdrawAddress] = useState('');
   const [withdrawAmount, setWithdrawAmount] = useState<string>('');
-  const [withdrawPassword, setWithdrawPassword] = useState('');
   const [isSubmittingWithdraw, setIsSubmittingWithdraw] = useState(false);
 
   // Recent Wallet Transactions
@@ -393,6 +414,7 @@ export const WalletView: React.FC = () => {
         amount: amt,
         txHash: manualTxHash.trim() || undefined,
         senderAddress: depositData?.address,
+        proofImage: proofImage || undefined,
       });
 
       showToast(
@@ -401,6 +423,8 @@ export const WalletView: React.FC = () => {
         `Your deposit of $${amt.toFixed(2)} USDT is waiting for Admin confirmation. Your balance will be credited as soon as Admin confirms.`
       );
       setManualTxHash('');
+      setProofImage(null);
+      setProofFileName('');
       await refreshBalances();
       await loadTransactions();
     } catch (err: any) {
@@ -449,11 +473,6 @@ export const WalletView: React.FC = () => {
       return;
     }
 
-    if (!withdrawPassword) {
-      showToast('error', 'Password Required', 'Please enter your account password to authorize this withdrawal.');
-      return;
-    }
-
     setIsSubmittingWithdraw(true);
     try {
       const res = await api.withdraw({
@@ -461,7 +480,6 @@ export const WalletView: React.FC = () => {
         network: 'aptos',
         destinationAddress: cleanAddr,
         amount: amt,
-        password: withdrawPassword,
       });
 
       showToast(
@@ -471,7 +489,6 @@ export const WalletView: React.FC = () => {
       );
       setWithdrawAddress('');
       setWithdrawAmount('');
-      setWithdrawPassword('');
       await refreshBalances();
       await loadTransactions();
     } catch (err: any) {
@@ -747,13 +764,14 @@ export const WalletView: React.FC = () => {
 
               {/* Deposit Confirmation & Verification Form */}
               <form onSubmit={handleSubmitDeposit} className="p-6 bg-white rounded-2xl border border-[#EADBCE] space-y-4">
-                <div className="flex items-center gap-2 text-xs font-bold text-slate-900">
-                  <ArrowDownLeft className="w-4 h-4 text-[#451A03]" />
-                  <span>Submit Deposit Confirmation (TxID)</span>
+                <div>
+                  <div className="text-xs sm:text-sm font-bold text-slate-900 tracking-tight">
+                    Submit Deposit Confirmation (TxID & Payment Proof)
+                  </div>
+                  <p className="text-xs text-slate-500 mt-1">
+                    After sending USDT to the official address above, enter your deposit amount, attach your payment proof screenshot (SS), and optionally provide your transaction hash (TxID). Once submitted, it appears on the Admin Confirmation Desk for verification.
+                  </p>
                 </div>
-                <p className="text-xs text-slate-500">
-                  After sending USDT to the address above, enter the deposit amount and your transaction hash (TxID). Once submitted, your deposit appears on the Admin Confirmation Desk for verification.
-                </p>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
@@ -789,12 +807,72 @@ export const WalletView: React.FC = () => {
                   </div>
                 </div>
 
+                {/* Payment Proof Screenshot (SS) Upload Segment */}
+                <div>
+                  <label className="block text-xs font-bold text-slate-800 mb-1.5">
+                    Payment Proof Screenshot (SS) / ادائیگی کا ثبوت تصویر
+                  </label>
+                  <div className="border-2 border-dashed border-[#EADBCE] hover:border-[#451A03]/40 rounded-2xl p-4 bg-[#FAF7F5] transition-all">
+                    {proofImage ? (
+                      <div className="flex flex-col sm:flex-row items-center gap-4">
+                        <div className="relative group shrink-0">
+                          <img
+                            src={proofImage}
+                            alt="Payment Proof Preview"
+                            className="w-24 h-24 sm:w-28 sm:h-28 object-cover rounded-xl border border-[#EADBCE] shadow-2xs"
+                          />
+                        </div>
+                        <div className="flex-1 text-center sm:text-left min-w-0">
+                          <p className="text-xs font-bold text-slate-900 truncate">{proofFileName || 'payment_proof_ss.png'}</p>
+                          <p className="text-[11px] text-emerald-600 font-semibold mt-0.5">Screenshot attached for Admin confirmation</p>
+                          <div className="mt-2.5 flex items-center justify-center sm:justify-start gap-3">
+                            <label className="text-[11px] font-bold text-[#451A03] hover:underline cursor-pointer">
+                              Change Screenshot
+                              <input
+                                type="file"
+                                accept="image/*"
+                                className="hidden"
+                                onChange={handleProofChange}
+                              />
+                            </label>
+                            <span className="text-slate-300">•</span>
+                            <button
+                              type="button"
+                              onClick={() => { setProofImage(null); setProofFileName(''); }}
+                              className="text-[11px] font-bold text-rose-600 hover:underline cursor-pointer"
+                            >
+                              Remove
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    ) : (
+                      <label className="flex flex-col items-center justify-center py-4 cursor-pointer text-center group">
+                        <div className="w-10 h-10 rounded-xl bg-white border border-[#EADBCE] flex items-center justify-center text-[#451A03] group-hover:scale-105 transition-transform shadow-2xs mb-2">
+                          <Upload className="w-5 h-5 text-[#451A03]" />
+                        </div>
+                        <span className="text-xs font-bold text-slate-800">
+                          Click to upload payment screenshot (SS) / رسید کی تصویر
+                        </span>
+                        <span className="text-[11px] text-slate-500 mt-1 max-w-md">
+                          Attach your transfer receipt or payment confirmation screenshot to accelerate admin approval (PNG, JPG, WEBP up to 5MB)
+                        </span>
+                        <input
+                          type="file"
+                          accept="image/*"
+                          className="hidden"
+                          onChange={handleProofChange}
+                        />
+                      </label>
+                    )}
+                  </div>
+                </div>
+
                 <button
                   type="submit"
                   disabled={isSubmittingDeposit}
                   className="w-full sm:w-auto px-6 py-2.5 rounded-xl bg-[#451A03] hover:bg-[#341402] text-white text-xs font-bold shadow-xs transition-all cursor-pointer disabled:opacity-50 flex items-center justify-center gap-2"
                 >
-                  <ArrowDownLeft className="w-4 h-4 text-white" />
                   <span>{isSubmittingDeposit ? 'Submitting to Admin Desk...' : 'Submit Deposit for Admin Confirmation'}</span>
                 </button>
               </form>
@@ -893,21 +971,6 @@ export const WalletView: React.FC = () => {
                     className="w-full h-11 pl-8 pr-4 text-xs font-bold bg-white border border-[#EADBCE] rounded-xl focus:border-[#451A03] text-slate-900 outline-none"
                   />
                 </div>
-              </div>
-
-              {/* Security Authorization Password */}
-              <div>
-                <label className="block text-xs font-bold text-slate-800 mb-1.5">
-                  Account Password Authorization *
-                </label>
-                <input
-                  type="password"
-                  required
-                  value={withdrawPassword}
-                  onChange={(e) => setWithdrawPassword(e.target.value)}
-                  placeholder="Enter your account password to authorize this withdrawal"
-                  className="w-full h-11 px-4 text-xs bg-white border border-[#EADBCE] rounded-xl focus:border-[#451A03] text-slate-900 outline-none"
-                />
               </div>
 
               {/* Fee Breakdown Card */}

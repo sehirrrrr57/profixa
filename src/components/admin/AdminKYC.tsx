@@ -5,12 +5,13 @@ import { Badge } from '../ui/Badge';
 import { Modal } from '../ui/Modal';
 import { useToast } from '../ui/Toast';
 import { KYCRecord, KYCStatus } from '../../types/index';
-import { ShieldCheck, Check, X, RefreshCw, FileText, Camera, Eye } from 'lucide-react';
+import { ShieldCheck, Check, X, RefreshCw, FileText, Camera, Eye, Download, ExternalLink, ZoomIn } from 'lucide-react';
 
 export const AdminKYC: React.FC = () => {
   const { showToast } = useToast();
   const [kycQueue, setKycQueue] = useState<KYCRecord[]>([]);
   const [selectedKyc, setSelectedKyc] = useState<KYCRecord | null>(null);
+  const [selectedDocPreview, setSelectedDocPreview] = useState<{ url: string; title: string; applicantName: string } | null>(null);
   const [adminNotes, setAdminNotes] = useState('');
   const [isProcessing, setIsProcessing] = useState(false);
 
@@ -39,6 +40,20 @@ export const AdminKYC: React.FC = () => {
       showToast('error', 'Decision failed', err.message);
     } finally {
       setIsProcessing(false);
+    }
+  };
+
+  const handleDownloadDocument = (url: string, filename: string) => {
+    try {
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      showToast('success', 'Download Started', `${filename} downloaded successfully.`);
+    } catch {
+      window.open(url, '_blank');
     }
   };
 
@@ -165,36 +180,178 @@ export const AdminKYC: React.FC = () => {
             </div>
 
             {/* Document Previews */}
-            <div className="space-y-2">
-              <span className="font-bold text-[#142033] block">Uploaded Documents</span>
-              <div className="grid grid-cols-2 gap-4">
-                <div className="p-3 bg-[#F7F9FC] rounded-xl border border-[#E5EAF0] text-center space-y-2">
-                  <p className="text-[11px] font-bold text-[#667085]">Government ID (Front)</p>
-                  {selectedKyc.documents.idFrontUrl ? (
-                    <div className="h-32 bg-white rounded-lg border border-[#E5EAF0] flex items-center justify-center p-2">
-                      <img
-                        src={selectedKyc.documents.idFrontUrl}
-                        alt="ID Front"
-                        className="max-h-full max-w-full object-contain rounded"
-                      />
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <span className="font-bold text-[#142033] text-xs">Uploaded Compliance Documents</span>
+                <span className="text-[11px] text-slate-500">Click any document to inspect in high resolution or download directly</span>
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                {/* ID Front */}
+                <div className="p-3 bg-[#FAF7F5] rounded-xl border border-[#EADBCE] space-y-2 flex flex-col justify-between">
+                  <div>
+                    <div className="flex items-center justify-between mb-1.5">
+                      <p className="text-[11px] font-bold text-slate-800">Government ID (Front)</p>
+                      {selectedKyc.documents.idFrontUrl && (
+                        <span className="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-200">
+                          Uploaded
+                        </span>
+                      )}
                     </div>
-                  ) : (
-                    <p className="py-8 text-[#98A2B3]">No file uploaded</p>
+                    {selectedKyc.documents.idFrontUrl ? (
+                      <div
+                        onClick={() => setSelectedDocPreview({ url: selectedKyc.documents.idFrontUrl!, title: 'Government ID (Front)', applicantName: selectedKyc.fullName })}
+                        className="h-36 bg-white rounded-lg border border-[#EADBCE] flex items-center justify-center p-1.5 cursor-pointer group relative overflow-hidden"
+                      >
+                        <img
+                          src={selectedKyc.documents.idFrontUrl}
+                          alt="ID Front"
+                          className="max-h-full max-w-full object-contain rounded group-hover:scale-105 transition-transform"
+                        />
+                        <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-1.5 text-white text-[11px] font-bold">
+                          <ZoomIn className="w-4 h-4" />
+                          <span>Click to Enlarge</span>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="h-36 bg-white rounded-lg border border-dashed border-[#EADBCE] flex flex-col items-center justify-center text-slate-400 text-[11px]">
+                        <FileText className="w-5 h-5 mb-1 text-slate-300" />
+                        <span>Not Uploaded</span>
+                      </div>
+                    )}
+                  </div>
+                  {selectedKyc.documents.idFrontUrl && (
+                    <div className="grid grid-cols-2 gap-1.5 pt-1 border-t border-[#EADBCE]">
+                      <button
+                        type="button"
+                        onClick={() => setSelectedDocPreview({ url: selectedKyc.documents.idFrontUrl!, title: 'Government ID (Front)', applicantName: selectedKyc.fullName })}
+                        className="w-full py-1.5 px-2 rounded-lg bg-white hover:bg-[#F5EDE8] border border-[#EADBCE] text-[#451A03] font-bold text-[11px] flex items-center justify-center gap-1 cursor-pointer"
+                      >
+                        <ZoomIn className="w-3.5 h-3.5" />
+                        <span>View Clear</span>
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => handleDownloadDocument(selectedKyc.documents.idFrontUrl!, `ID_Front_${selectedKyc.fullName.replace(/\s+/g, '_')}.png`)}
+                        className="w-full py-1.5 px-2 rounded-lg bg-[#451A03] hover:bg-[#341402] text-white font-bold text-[11px] flex items-center justify-center gap-1 cursor-pointer"
+                      >
+                        <Download className="w-3.5 h-3.5" />
+                        <span>Download</span>
+                      </button>
+                    </div>
                   )}
                 </div>
 
-                <div className="p-3 bg-[#F7F9FC] rounded-xl border border-[#E5EAF0] text-center space-y-2">
-                  <p className="text-[11px] font-bold text-[#667085]">Biometric Selfie</p>
-                  {selectedKyc.documents.selfieUrl ? (
-                    <div className="h-32 bg-white rounded-lg border border-[#E5EAF0] flex items-center justify-center p-2">
-                      <img
-                        src={selectedKyc.documents.selfieUrl}
-                        alt="Selfie"
-                        className="max-h-full max-w-full object-contain rounded"
-                      />
+                {/* ID Back */}
+                <div className="p-3 bg-[#FAF7F5] rounded-xl border border-[#EADBCE] space-y-2 flex flex-col justify-between">
+                  <div>
+                    <div className="flex items-center justify-between mb-1.5">
+                      <p className="text-[11px] font-bold text-slate-800">Government ID (Back)</p>
+                      {selectedKyc.documents.idBackUrl ? (
+                        <span className="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-200">
+                          Uploaded
+                        </span>
+                      ) : (
+                        <span className="text-[10px] text-slate-400">Optional</span>
+                      )}
                     </div>
-                  ) : (
-                    <p className="py-8 text-[#98A2B3]">No selfie uploaded</p>
+                    {selectedKyc.documents.idBackUrl ? (
+                      <div
+                        onClick={() => setSelectedDocPreview({ url: selectedKyc.documents.idBackUrl!, title: 'Government ID (Back)', applicantName: selectedKyc.fullName })}
+                        className="h-36 bg-white rounded-lg border border-[#EADBCE] flex items-center justify-center p-1.5 cursor-pointer group relative overflow-hidden"
+                      >
+                        <img
+                          src={selectedKyc.documents.idBackUrl}
+                          alt="ID Back"
+                          className="max-h-full max-w-full object-contain rounded group-hover:scale-105 transition-transform"
+                        />
+                        <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-1.5 text-white text-[11px] font-bold">
+                          <ZoomIn className="w-4 h-4" />
+                          <span>Click to Enlarge</span>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="h-36 bg-white rounded-lg border border-dashed border-[#EADBCE] flex flex-col items-center justify-center text-slate-400 text-[11px]">
+                        <FileText className="w-5 h-5 mb-1 text-slate-300" />
+                        <span>Not Provided</span>
+                      </div>
+                    )}
+                  </div>
+                  {selectedKyc.documents.idBackUrl && (
+                    <div className="grid grid-cols-2 gap-1.5 pt-1 border-t border-[#EADBCE]">
+                      <button
+                        type="button"
+                        onClick={() => setSelectedDocPreview({ url: selectedKyc.documents.idBackUrl!, title: 'Government ID (Back)', applicantName: selectedKyc.fullName })}
+                        className="w-full py-1.5 px-2 rounded-lg bg-white hover:bg-[#F5EDE8] border border-[#EADBCE] text-[#451A03] font-bold text-[11px] flex items-center justify-center gap-1 cursor-pointer"
+                      >
+                        <ZoomIn className="w-3.5 h-3.5" />
+                        <span>View Clear</span>
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => handleDownloadDocument(selectedKyc.documents.idBackUrl!, `ID_Back_${selectedKyc.fullName.replace(/\s+/g, '_')}.png`)}
+                        className="w-full py-1.5 px-2 rounded-lg bg-[#451A03] hover:bg-[#341402] text-white font-bold text-[11px] flex items-center justify-center gap-1 cursor-pointer"
+                      >
+                        <Download className="w-3.5 h-3.5" />
+                        <span>Download</span>
+                      </button>
+                    </div>
+                  )}
+                </div>
+
+                {/* Biometric Selfie */}
+                <div className="p-3 bg-[#FAF7F5] rounded-xl border border-[#EADBCE] space-y-2 flex flex-col justify-between">
+                  <div>
+                    <div className="flex items-center justify-between mb-1.5">
+                      <p className="text-[11px] font-bold text-slate-800">Biometric Selfie</p>
+                      {selectedKyc.documents.selfieUrl ? (
+                        <span className="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-200">
+                          Uploaded
+                        </span>
+                      ) : (
+                        <span className="text-[10px] text-slate-400">Optional</span>
+                      )}
+                    </div>
+                    {selectedKyc.documents.selfieUrl ? (
+                      <div
+                        onClick={() => setSelectedDocPreview({ url: selectedKyc.documents.selfieUrl!, title: 'Biometric Selfie', applicantName: selectedKyc.fullName })}
+                        className="h-36 bg-white rounded-lg border border-[#EADBCE] flex items-center justify-center p-1.5 cursor-pointer group relative overflow-hidden"
+                      >
+                        <img
+                          src={selectedKyc.documents.selfieUrl}
+                          alt="Selfie"
+                          className="max-h-full max-w-full object-contain rounded group-hover:scale-105 transition-transform"
+                        />
+                        <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-1.5 text-white text-[11px] font-bold">
+                          <ZoomIn className="w-4 h-4" />
+                          <span>Click to Enlarge</span>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="h-36 bg-white rounded-lg border border-dashed border-[#EADBCE] flex flex-col items-center justify-center text-slate-400 text-[11px]">
+                        <Camera className="w-5 h-5 mb-1 text-slate-300" />
+                        <span>No Selfie Attached</span>
+                      </div>
+                    )}
+                  </div>
+                  {selectedKyc.documents.selfieUrl && (
+                    <div className="grid grid-cols-2 gap-1.5 pt-1 border-t border-[#EADBCE]">
+                      <button
+                        type="button"
+                        onClick={() => setSelectedDocPreview({ url: selectedKyc.documents.selfieUrl!, title: 'Biometric Selfie', applicantName: selectedKyc.fullName })}
+                        className="w-full py-1.5 px-2 rounded-lg bg-white hover:bg-[#F5EDE8] border border-[#EADBCE] text-[#451A03] font-bold text-[11px] flex items-center justify-center gap-1 cursor-pointer"
+                      >
+                        <ZoomIn className="w-3.5 h-3.5" />
+                        <span>View Clear</span>
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => handleDownloadDocument(selectedKyc.documents.selfieUrl!, `Selfie_${selectedKyc.fullName.replace(/\s+/g, '_')}.png`)}
+                        className="w-full py-1.5 px-2 rounded-lg bg-[#451A03] hover:bg-[#341402] text-white font-bold text-[11px] flex items-center justify-center gap-1 cursor-pointer"
+                      >
+                        <Download className="w-3.5 h-3.5" />
+                        <span>Download</span>
+                      </button>
+                    </div>
                   )}
                 </div>
               </div>
@@ -245,6 +402,49 @@ export const AdminKYC: React.FC = () => {
           </div>
         </Modal>
       )}
+
+      {/* High-Resolution Document Inspection Modal Viewer */}
+      <Modal
+        isOpen={!!selectedDocPreview}
+        onClose={() => setSelectedDocPreview(null)}
+        title={selectedDocPreview ? `${selectedDocPreview.title} — ${selectedDocPreview.applicantName}` : 'Document Inspection'}
+        subtitle="High-resolution compliance audit inspection with direct download"
+        maxWidth="lg"
+      >
+        {selectedDocPreview && (
+          <div className="space-y-4">
+            <div className="rounded-xl overflow-hidden border border-[#EADBCE] bg-[#FAF7F5] flex items-center justify-center p-2">
+              <img
+                src={selectedDocPreview.url}
+                alt={selectedDocPreview.title}
+                className="max-h-[70vh] w-auto max-w-full object-contain rounded-lg shadow-sm"
+              />
+            </div>
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-3 border-t border-[#EADBCE]">
+              <span className="text-slate-500 font-medium text-xs">Verify that name, dates, photo, and ID numbers match applicant details.</span>
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => handleDownloadDocument(selectedDocPreview.url, `${selectedDocPreview.title.replace(/\s+/g, '_')}_${selectedDocPreview.applicantName.replace(/\s+/g, '_')}.png`)}
+                  className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-[#451A03] hover:bg-[#341402] text-white font-bold text-xs shadow-xs transition-all cursor-pointer"
+                >
+                  <Download className="w-3.5 h-3.5" />
+                  <span>Download Document</span>
+                </button>
+                <a
+                  href={selectedDocPreview.url}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="inline-flex items-center gap-1 px-3 py-2 rounded-xl bg-[#FAF7F5] hover:bg-[#F5EDE8] border border-[#EADBCE] text-slate-800 font-bold text-xs transition-all cursor-pointer"
+                >
+                  <span>Open Full View</span>
+                  <ExternalLink className="w-3.5 h-3.5" />
+                </a>
+              </div>
+            </div>
+          </div>
+        )}
+      </Modal>
     </div>
   );
 };

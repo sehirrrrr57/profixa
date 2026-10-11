@@ -2,13 +2,15 @@ import React, { useState, useEffect } from 'react';
 import { api } from '../../lib/api';
 import { Button } from '../ui/Button';
 import { Badge } from '../ui/Badge';
+import { Modal } from '../ui/Modal';
 import { useToast } from '../ui/Toast';
-import { ArrowDownLeft, Check, X, RefreshCw, AlertCircle, Clock, ShieldCheck, User } from 'lucide-react';
+import { ArrowDownLeft, Check, X, RefreshCw, AlertCircle, Clock, ShieldCheck, User, Image as ImageIcon, ExternalLink, Download } from 'lucide-react';
 
 export const AdminDeposits: React.FC = () => {
   const { showToast } = useToast();
   const [deposits, setDeposits] = useState<any[]>([]);
-  const [filter, setFilter] = useState<'ALL' | 'PENDING' | 'CONFIRMED' | 'REJECTED'>('PENDING');
+  const [filter, setFilter] = useState<'ALL' | 'PENDING' | 'CONFIRMED' | 'REJECTED'>('ALL');
+  const [selectedProofModal, setSelectedProofModal] = useState<string | null>(null);
   const [isProcessing, setIsProcessing] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -45,12 +47,35 @@ export const AdminDeposits: React.FC = () => {
     }
   };
 
+  const handleDownloadProof = (dataUrl: string, filename = 'payment_proof_ss.png') => {
+    try {
+      const a = document.createElement('a');
+      a.href = dataUrl;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      showToast('success', 'Download Started', 'Payment proof screenshot downloaded.');
+    } catch {
+      window.open(dataUrl, '_blank');
+    }
+  };
+
   const filtered = deposits.filter((tx) => {
     if (filter === 'ALL') return true;
     return tx.status === filter;
   });
 
   const pendingCount = deposits.filter((tx) => tx.status === 'PENDING').length;
+  const confirmedCount = deposits.filter((tx) => tx.status === 'CONFIRMED').length;
+  const rejectedCount = deposits.filter((tx) => tx.status === 'REJECTED').length;
+
+  const tabLabels: Record<'ALL' | 'PENDING' | 'CONFIRMED' | 'REJECTED', string> = {
+    ALL: `All (${deposits.length})`,
+    PENDING: `Pending (${pendingCount})`,
+    CONFIRMED: `Confirmed (${confirmedCount})`,
+    REJECTED: `Rejected (${rejectedCount})`,
+  };
 
   return (
     <div className="space-y-6 pb-12">
@@ -87,8 +112,8 @@ export const AdminDeposits: React.FC = () => {
       </div>
 
       {/* Filter Tabs */}
-      <div className="flex rounded-xl bg-white p-1 border border-[#EADBCE] shadow-2xs max-w-md gap-1">
-        {(['PENDING', 'CONFIRMED', 'REJECTED', 'ALL'] as const).map((tab) => (
+      <div className="flex rounded-xl bg-white p-1 border border-[#EADBCE] shadow-2xs max-w-lg gap-1">
+        {(['ALL', 'PENDING', 'CONFIRMED', 'REJECTED'] as const).map((tab) => (
           <button
             key={tab}
             type="button"
@@ -99,7 +124,7 @@ export const AdminDeposits: React.FC = () => {
                 : 'text-slate-600 hover:text-slate-900 hover:bg-[#FDF8F5]'
             }`}
           >
-            {tab === 'PENDING' ? `Pending (${pendingCount})` : tab.charAt(0) + tab.slice(1).toLowerCase()}
+            {tabLabels[tab]}
           </button>
         ))}
       </div>
@@ -140,8 +165,43 @@ export const AdminDeposits: React.FC = () => {
                     <td className="py-3.5 px-4 font-black text-emerald-600 text-sm">
                       +${tx.amount.toFixed(2)}
                     </td>
-                    <td className="py-3.5 px-4 font-mono text-[11px] text-slate-600 max-w-[140px] truncate" title={tx.txHash}>
-                      {tx.txHash || 'N/A'}
+                    <td className="py-3.5 px-4">
+                      <div className="flex items-center gap-2">
+                        {tx.proofImage ? (
+                          <button
+                            type="button"
+                            onClick={() => setSelectedProofModal(tx.proofImage)}
+                            className="relative group shrink-0 cursor-pointer"
+                            title="Click to view payment proof screenshot"
+                          >
+                            <img
+                              src={tx.proofImage}
+                              alt="SS Proof"
+                              className="w-10 h-10 object-cover rounded-lg border border-[#EADBCE] group-hover:ring-2 group-hover:ring-[#451A03] shadow-2xs"
+                            />
+                            <span className="absolute -bottom-1 -right-1 bg-[#451A03] text-white text-[8px] font-bold px-1 rounded shadow-2xs">
+                              SS
+                            </span>
+                          </button>
+                        ) : null}
+                        <div className="min-w-0">
+                          <div className="font-mono text-[11px] text-slate-700 max-w-[130px] truncate" title={tx.txHash}>
+                            {tx.txHash || 'No TxID'}
+                          </div>
+                          {tx.proofImage ? (
+                            <button
+                              type="button"
+                              onClick={() => setSelectedProofModal(tx.proofImage)}
+                              className="text-[10px] text-[#451A03] font-bold hover:underline cursor-pointer flex items-center gap-1 mt-0.5"
+                            >
+                              <ImageIcon className="w-3 h-3 text-[#451A03]" />
+                              <span>View Proof SS</span>
+                            </button>
+                          ) : (
+                            <span className="text-[10px] text-slate-400">No screenshot</span>
+                          )}
+                        </div>
+                      </div>
                     </td>
                     <td className="py-3.5 px-4">
                       <Badge
@@ -192,6 +252,49 @@ export const AdminDeposits: React.FC = () => {
           </div>
         )}
       </div>
+
+      {/* Payment Proof Screenshot Modal Viewer */}
+      <Modal
+        isOpen={!!selectedProofModal}
+        onClose={() => setSelectedProofModal(null)}
+        title="Payment Proof Screenshot (SS)"
+        subtitle="User-submitted transfer receipt and blockchain transaction confirmation"
+        maxWidth="lg"
+      >
+        {selectedProofModal && (
+          <div className="space-y-4">
+            <div className="rounded-xl overflow-hidden border border-[#EADBCE] bg-[#FAF7F5] flex items-center justify-center p-2">
+              <img
+                src={selectedProofModal}
+                alt="Payment Proof Full View"
+                className="max-h-[70vh] w-auto max-w-full object-contain rounded-lg shadow-sm"
+              />
+            </div>
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-3 border-t border-[#EADBCE]">
+              <span className="text-slate-500 font-medium text-xs">Verify that the amount, network, and recipient address match before approving.</span>
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => handleDownloadProof(selectedProofModal, `payment_proof_${Date.now()}.png`)}
+                  className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-[#451A03] hover:bg-[#341402] text-white font-bold text-xs shadow-xs transition-all cursor-pointer"
+                >
+                  <Download className="w-3.5 h-3.5" />
+                  <span>Download Screenshot</span>
+                </button>
+                <a
+                  href={selectedProofModal}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="inline-flex items-center gap-1 px-3 py-2 rounded-xl bg-[#FAF7F5] hover:bg-[#F5EDE8] border border-[#EADBCE] text-slate-800 font-bold text-xs transition-all cursor-pointer"
+                >
+                  <span>Open Full View</span>
+                  <ExternalLink className="w-3.5 h-3.5" />
+                </a>
+              </div>
+            </div>
+          </div>
+        )}
+      </Modal>
     </div>
   );
 };

@@ -48,7 +48,7 @@ export const TransactionsView: React.FC = () => {
 
   const handleExportCSV = async () => {
     try {
-      const token = localStorage.getItem('cryptic_token');
+      const token = localStorage.getItem('profixa_token') || localStorage.getItem('cryptic_token');
       const headers: Record<string, string> = {};
       if (token) headers['Authorization'] = `Bearer ${token}`;
 
